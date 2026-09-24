@@ -160,6 +160,8 @@ tfoot td.name{text-align:left;font-size:.78rem;font-weight:600;font-style:normal
   background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px 10px}
 .form input:focus-visible{outline:2px solid var(--orange);outline-offset:1px}
 .form .fila{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.form .fila.tres{grid-template-columns:1.2fr 1fr .9fr}
+@media (max-width:560px){.form .fila,.form .fila.tres{grid-template-columns:1fr}}
 .form .evs{display:grid;gap:7px}
 .form button{font:600 .9rem Switzer,"Plus Jakarta Sans",sans-serif;background:var(--blue);color:#fff;
   border:0;border-radius:9px;padding:11px;cursor:pointer}
@@ -197,15 +199,32 @@ tfoot td.name{text-align:left;font-size:.78rem;font-weight:600;font-style:normal
 .pdot.s4{background:var(--e4-bg);box-shadow:none}
 
 .sem{display:grid;gap:9px}
+.cal{display:grid;gap:7px;margin-top:4px}
+.cal-cab{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:0 4px}
+.cal-cab span{font-size:.7rem;font-style:italic;color:var(--ink-2);text-align:center}
+.cal-sem{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:7px 6px 8px;
+  border-radius:11px;background:var(--ls);border:1px solid var(--lf);border-left-width:5px}
+.cal-sem .dia{display:flex;align-items:center;justify-content:center;height:30px;border-radius:7px;
+  font-size:.82rem;font-weight:600;color:var(--ink-2);background:transparent}
+.cal-sem .dia.habil{background:var(--lf);color:#fff}
+.cal-sem .dia.fuera{opacity:.35}
+.cal-sem .dia.hoy{box-shadow:0 0 0 2px var(--ink)}
+.cal-lider{grid-column:1 / -1;font:700 .86rem Inter,sans-serif;color:var(--lf);
+  padding-top:5px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.cal-lider .ahora{background:var(--lf)}
+.cal-leyenda{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
+.cal-chip{display:flex;align-items:center;gap:6px;font-size:.76rem;font-weight:600;color:var(--lf);
+  background:var(--ls);border-radius:99px;padding:5px 11px}
+.cal-chip i{width:9px;height:9px;border-radius:3px;background:var(--lf);display:block}
+.cal-chip.off{opacity:.45}
 .semana{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;
   border:1px solid var(--line);border-radius:11px;padding:10px 12px;background:var(--bg)}
 .semana.activa{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue);background:var(--blue-soft)}
 .semana b{font-size:.92rem;font-weight:700;font-family:Inter,sans-serif;display:block}
 .semana em{font-style:italic;font-size:.78rem;color:var(--ink-2);display:block}
-.semana select{font:600 .85rem Switzer,"Plus Jakarta Sans",sans-serif;color:var(--ink);
-  background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:8px 10px;
-  min-width:170px;max-width:100%}
-.semana select:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+.quien-sem{font:700 .92rem Inter,sans-serif;color:var(--ink);background:var(--panel);
+  border:1px solid var(--line);border-radius:9px;padding:8px 12px;white-space:nowrap}
+.semana.activa .quien-sem{background:#fff;border-color:var(--blue);color:var(--blue)}
 .ahora{font-size:.68rem;font-weight:700;color:#fff;background:var(--blue);
   border-radius:99px;padding:2px 8px;margin-left:7px;vertical-align:middle}
 
@@ -304,6 +323,7 @@ const EST = ["Sin novedad","En desarrollo","Se entrega","Calificada","No entrega
 const LLAVE = "phantom-evidencias-v2";
 
 const SEED_MESES = [
+  {id:"2026-08", orden:202608, nombre:"Agosto 2026", corte:"", evidencias:[]},
   {id:"2026-09", orden:202609, nombre:"Septiembre 2026", corte:"2026-09-29", evidencias:[
     {corto:"Bitácora del despiece", comp:"Técnico · GA4-250201021-AA1-EV01", largo:"Bitácora del despiece del storyboard"},
     {corto:"Virtual job interview", comp:"Bilingüismo · GA4-240202501-AA1-EV02", largo:"Virtual job interview"},
@@ -341,15 +361,16 @@ const SEED_SEP = {
   ap9:{ev:[3,3,1,1], f:["","","26 de septiembre, 12:00 p. m.","27 de septiembre, 12:00 p. m."]}
 };
 const SEED_SEM = [
-  {mes:"2026-09", orden:1, etiqueta:"Semana 1", rango:"1 al 6 de septiembre", lider:""},
-  {mes:"2026-09", orden:2, etiqueta:"Semana 2", rango:"7 al 13 de septiembre", lider:""},
-  {mes:"2026-09", orden:3, etiqueta:"Semana 3", rango:"14 al 20 de septiembre", lider:""},
-  {mes:"2026-09", orden:4, etiqueta:"Semana 4", rango:"21 al 27 de septiembre", lider:""},
-  {mes:"2026-09", orden:5, etiqueta:"Semana 5", rango:"28 de septiembre al 4 de octubre", lider:""},
-  {mes:"2026-10", orden:1, etiqueta:"Semana 1", rango:"5 al 11 de octubre", lider:""},
-  {mes:"2026-10", orden:2, etiqueta:"Semana 2", rango:"12 al 18 de octubre", lider:""},
-  {mes:"2026-10", orden:3, etiqueta:"Semana 3", rango:"19 al 25 de octubre", lider:""},
-  {mes:"2026-10", orden:4, etiqueta:"Semana 4", rango:"26 de octubre al 1 de noviembre", lider:""}
+  {mes:"2026-08", orden:1, etiqueta:"Semana 1", rango:"24 al 28 de agosto", lider:"ap6"},
+  {mes:"2026-09", orden:1, etiqueta:"Semana 1", rango:"1 al 4 de septiembre", lider:"ap9"},
+  {mes:"2026-09", orden:2, etiqueta:"Semana 2", rango:"7 al 11 de septiembre", lider:"ap5"},
+  {mes:"2026-09", orden:3, etiqueta:"Semana 3", rango:"14 al 18 de septiembre", lider:"ap3"},
+  {mes:"2026-09", orden:4, etiqueta:"Semana 4", rango:"21 al 25 de septiembre", lider:"ap1"},
+  {mes:"2026-09", orden:5, etiqueta:"Semana 5", rango:"28 de septiembre al 2 de octubre", lider:"ap7"},
+  {mes:"2026-10", orden:1, etiqueta:"Semana 1", rango:"5 al 9 de octubre", lider:"ap6"},
+  {mes:"2026-10", orden:2, etiqueta:"Semana 2", rango:"12 al 16 de octubre", lider:"ap9"},
+  {mes:"2026-10", orden:3, etiqueta:"Semana 3", rango:"19 al 23 de octubre", lider:"ap5"},
+  {mes:"2026-10", orden:4, etiqueta:"Semana 4", rango:"26 al 30 de octubre", lider:"ap3"}
 ];
 
 let db = null, local = null;
@@ -422,7 +443,7 @@ function pintarTabla(){
     return;
   }
   let h = '<thead><tr><th class="name">Aprendiz</th>';
-  evs.forEach(e => { h += '<th>' + esc(e.corto) + '<span>' + esc(e.comp) + '</span></th>'; });
+  evs.forEach(e => { h += '<th>' + esc(e.corto) + '<span>' + esc(e.comp) + (e.limite ? '<br>plazo: ' + esc(e.limite) : '') + '</span></th>'; });
   h += '</tr></thead><tbody>';
   filas.forEach(d => {
     const rojo = d.evidencias.some(e => e.estado === 4);
@@ -573,6 +594,51 @@ function nombreLider(id){
   return a ? a.nombre : "Sin asignar";
 }
 
+const MESES_ES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto",
+  "septiembre","octubre","noviembre","diciembre"];
+const ROTACION = ["ap6","ap9","ap5","ap3","ap1","ap7"];
+const ANCLA = new Date(2026, 7, 24);   // lunes 24 de agosto de 2026, turno de Charles
+
+function lunesDe(f){
+  const d = new Date(f.getFullYear(), f.getMonth(), f.getDate());
+  d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+  return d;
+}
+function turnoDe(lunes){
+  const n = Math.round((lunes - ANCLA) / 604800000);
+  const i = ((n % ROTACION.length) + ROTACION.length) % ROTACION.length;
+  return ROTACION[i];
+}
+function textoRango(lunes){
+  const vie = new Date(lunes); vie.setDate(vie.getDate() + 4);
+  return lunes.getMonth() === vie.getMonth()
+    ? lunes.getDate() + " al " + vie.getDate() + " de " + MESES_ES[vie.getMonth()]
+    : lunes.getDate() + " de " + MESES_ES[lunes.getMonth()] + " al " + vie.getDate() + " de " + MESES_ES[vie.getMonth()];
+}
+function claveSemana(lunes){
+  const m = lunes.getMonth() + 1;
+  return lunes.getFullYear() + "-" + (m < 10 ? "0" + m : m) + "-" + (lunes.getDate() < 10 ? "0" + lunes.getDate() : lunes.getDate());
+}
+function guardadaEn(lunes){
+  return semanas.find(s => {
+    const r = rangoSemana(s);
+    return r && r.ini.getFullYear() === lunes.getFullYear() && r.ini.getMonth() === lunes.getMonth()
+      && r.ini.getDate() === lunes.getDate();
+  });
+}
+function semanaDe(lunes, n){
+  const g = guardadaEn(lunes);
+  const vie = new Date(lunes); vie.setDate(vie.getDate() + 4);
+  return {
+    id: g ? g.id : "auto__" + claveSemana(lunes),
+    etiqueta: g && g.etiqueta ? g.etiqueta : ("Semana " + (n || "")),
+    rango: g && g.rango ? g.rango : textoRango(lunes),
+    lider: g && g.lider ? g.lider : turnoDe(lunes),
+    auto: !(g && g.lider),
+    ini: lunes, fin: vie
+  };
+}
+
 function pintarTurno(){
   const caja = document.getElementById("turno");
   const hoy = new Date(); hoy.setHours(12,0,0,0);
@@ -602,36 +668,58 @@ function pintarTurno(){
     tarjeta(todas[iAct+1], "Próximo líder", false) + '</div>';
 }
 
+const COLOR_LIDER = {
+  ap6:{f:"#12508f", s:"#dbe7f6"},
+  ap9:{f:"#c2600f", s:"#fbe6cd"},
+  ap5:{f:"#2f7d47", s:"#d9edd9"},
+  ap3:{f:"#6b4a9c", s:"#e6dff5"},
+  ap1:{f:"#9a7b12", s:"#f6ecc6"},
+  ap7:{f:"#a83a58", s:"#f7dde3"}
+};
+const DIAS_ES = ["lun","mar","mié","jue","vie","sáb","dom"];
+
 function pintarLideres(){
   const caja = document.getElementById("lideres");
-  const lista = semanas.filter(s => s.mes === mesActivo).sort((a,b) => a.orden - b.orden);
-  if(!lista.length){
-    caja.innerHTML = '<h2>Líderes por semana</h2><p class="vacio">Este mes todavía no tiene semanas cargadas.</p>';
-    return;
-  }
-  const hoy = new Date(); hoy.setHours(12,0,0,0);
-  let h = '<h2>Líderes por semana</h2><p class="cuenta">A quién le toca coordinar cada semana. Elige el nombre en la lista.</p><div class="sem">';
-  lista.forEach(s => {
-    const r = rangoSemana(s);
-    const act = r && hoy >= r.ini && hoy <= r.fin;
-    h += '<div class="semana' + (act ? ' activa' : '') + '"><div><b>' + esc(s.etiqueta) +
-      (act ? '<span class="ahora">esta semana</span>' : '') + '</b><em>' + esc(s.rango || "") + '</em></div>' +
-      '<select data-s="' + s.id + '"' + (soloLectura ? ' disabled' : '') + '><option value="">Sin asignar</option>' +
-      aprendices.map(a => '<option value="' + a.id + '"' + (s.lider === a.id ? ' selected' : '') + '>' +
-        esc(a.nombre) + '</option>').join("") + '</select></div>';
-  });
-  caja.innerHTML = h + '</div>';
-  caja.querySelectorAll("select").forEach(sl => sl.addEventListener("change", () => {
-    const s = semanas.find(x => x.id === sl.dataset.s);
-    if(!s) return;
-    s.lider = sl.value;
-    guardar("semanas", s.id, {mes:s.mes, orden:s.orden, etiqueta:s.etiqueta, rango:s.rango, lider:s.lider});
-    pintarTurno(); pintarLideres();
-  }));
-}
+  if(!mesActivo){ caja.innerHTML = '<h2>Líderes por semana</h2><p class="vacio">Elige un mes.</p>'; return; }
+  const p = mesActivo.split("-").map(Number);
+  const primero = new Date(p[0], p[1]-1, 1);
+  const ultimo = new Date(p[0], p[1], 0);
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
 
-const MESES_ES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto",
-  "septiembre","octubre","noviembre","diciembre"];
+  let h = '<h2>Líderes por semana</h2><p class="cuenta">Cada semana toma el color de quien lidera. Los días hábiles van de lunes a viernes.</p>';
+  h += '<div class="cal"><div class="cal-cab">' + DIAS_ES.map(d => '<span>' + d + '</span>').join("") + '</div>';
+
+  let cursor = lunesDe(primero);
+  const usados = [];
+  while(cursor <= ultimo){
+    const lunes = new Date(cursor);
+    const g = guardadaEn(lunes);
+    const lider = (g && g.lider) ? g.lider : turnoDe(lunes);
+    const col = COLOR_LIDER[lider] || {f:"var(--ink-2)", s:"var(--bg)"};
+    if(usados.indexOf(lider) === -1) usados.push(lider);
+    h += '<div class="cal-sem" style="--lf:' + col.f + ';--ls:' + col.s + '">';
+    for(let i = 0; i < 7; i++){
+      const d = new Date(lunes); d.setDate(d.getDate() + i);
+      const fuera = d.getMonth() !== primero.getMonth();
+      const habil = i < 5;
+      const esHoy = d.getTime() === hoy.getTime();
+      h += '<span class="dia' + (fuera ? ' fuera' : '') + (habil && !fuera ? ' habil' : '') +
+        (esHoy ? ' hoy' : '') + '">' + d.getDate() + '</span>';
+    }
+    h += '<span class="cal-lider">' + esc(nombreLider(lider)) +
+      (hoy >= lunes && hoy <= new Date(lunes.getFullYear(), lunes.getMonth(), lunes.getDate()+6)
+        ? '<b class="ahora">esta semana</b>' : '') + '</span></div>';
+    cursor.setDate(cursor.getDate() + 7);
+  }
+  h += '</div>';
+
+  h += '<div class="cal-leyenda">' + ROTACION.map(id =>
+    '<span class="cal-chip' + (usados.indexOf(id) === -1 ? ' off' : '') +
+    '" style="--lf:' + (COLOR_LIDER[id] ? COLOR_LIDER[id].f : "var(--ink-2)") + ';--ls:' +
+    (COLOR_LIDER[id] ? COLOR_LIDER[id].s : "var(--bg)") + '"><i></i>' +
+    esc(nombreLider(id)) + '</span>').join("") + '</div>';
+  caja.innerHTML = h;
+}
 
 function pintarNuevo(){
   const caja = document.getElementById("nuevo");
@@ -640,13 +728,13 @@ function pintarNuevo(){
     return;
   }
   caja.innerHTML = '<h2>Agregar un mes</h2>' +
-    '<p class="cuenta">Crea el mes con sus evidencias. Las semanas se generan solas y el liderazgo se reparte entre todos los aprendices, en orden de lista. Después puedes cambiarlo.</p>' +
+    '<p class="cuenta">Crea el mes con sus evidencias. Las semanas y el turno de liderazgo se calculan solos, siguiendo el bucle.</p>' +
     '<div class="form">' +
       '<div class="fila">' +
         '<div><label for="n-mes">Mes</label><input id="n-mes" type="month"></div>' +
         '<div><label for="n-corte">Fecha del corte</label><input id="n-corte" type="date"></div>' +
       '</div>' +
-      '<div><label>Evidencias del mes (nombre y componente)</label><div class="evs" id="n-evs"></div></div>' +
+      '<div><label>Evidencias del mes: nombre, componente y plazo de entrega</label><div class="evs" id="n-evs"></div></div>' +
       '<button type="button" class="sec" id="n-add">Agregar otra evidencia</button>' +
       '<button type="button" id="n-crear">Crear mes</button>' +
       '<p class="msg" id="n-msg"></p>' +
@@ -655,35 +743,15 @@ function pintarNuevo(){
   const fila = () => {
     const d = document.createElement("div");
     d.className = "fila";
+    d.className = "fila tres";
     d.innerHTML = '<input type="text" class="n-nom" placeholder="Nombre de la evidencia">' +
-      '<input type="text" class="n-comp" placeholder="Componente y código">';
+      '<input type="text" class="n-comp" placeholder="Componente y código">' +
+      '<input type="text" class="n-lim" placeholder="Plazo de entrega">';
     cont.appendChild(d);
   };
   for(let i = 0; i < 4; i++) fila();
   document.getElementById("n-add").addEventListener("click", fila);
   document.getElementById("n-crear").addEventListener("click", crearMes);
-}
-
-function semanasDelMes(mesId, etiquetaMes){
-  const p = mesId.split("-").map(Number);
-  const primero = new Date(p[0], p[1]-1, 1);
-  const ultimo = new Date(p[0], p[1], 0);
-  const out = [];
-  let cursor = new Date(primero);
-  cursor.setDate(cursor.getDate() - ((cursor.getDay() + 6) % 7));
-  let n = 1;
-  while(cursor <= ultimo){
-    const fin = new Date(cursor); fin.setDate(fin.getDate() + 6);
-    const ini = cursor < primero ? primero : new Date(cursor);
-    const rango = ini.getDate() + " al " + fin.getDate() +
-      (fin.getMonth() === ini.getMonth() ? " de " + MESES_ES[ini.getMonth()]
-        : " de " + MESES_ES[fin.getMonth()]);
-    const turno = aprendices.length ? aprendices[(n-1) % aprendices.length].id : "";
-    out.push({id: mesId + "__s" + n, mes: mesId, orden: n, etiqueta: "Semana " + n, rango: rango, lider: turno});
-    cursor = new Date(fin); cursor.setDate(cursor.getDate() + 1);
-    n++;
-  }
-  return out;
 }
 
 async function crearMes(){
@@ -696,7 +764,8 @@ async function crearMes(){
   document.querySelectorAll("#n-evs .fila").forEach(f => {
     const nom = f.querySelector(".n-nom").value.trim();
     const comp = f.querySelector(".n-comp").value.trim();
-    if(nom) evs.push({corto: nom, comp: comp || "Por definir", largo: nom});
+    const lim = f.querySelector(".n-lim").value.trim();
+    if(nom) evs.push({corto: nom, comp: comp || "Por definir", largo: nom, limite: lim});
   });
   if(!evs.length){ msg.textContent = "Escribe al menos una evidencia."; return; }
   const p = mesVal.split("-").map(Number);
@@ -705,13 +774,8 @@ async function crearMes(){
   msg.textContent = "Creando el mes…";
   meses.push(Object.assign({id: mesVal}, doc));
   meses.sort((a,b) => (a.orden||0) - (b.orden||0));
-  const sems = semanasDelMes(mesVal, nombre);
-  sems.forEach(x => semanas.push(x));
   mesActivo = mesVal;
   await guardar("meses", mesVal, doc);
-  for(const x of sems){
-    await guardar("semanas", x.id, {mes:x.mes, orden:x.orden, etiqueta:x.etiqueta, rango:x.rango, lider:x.lider});
-  }
   pintarTodo();
   const m2 = document.getElementById("n-msg");
   if(m2) m2.textContent = "Mes creado. Ya puedes marcar las evidencias.";
@@ -744,7 +808,7 @@ function pintarSheet(){
   if(!d) return;
   const e = d.evidencias[sel.ev];
   document.getElementById("sh-ev").textContent = evs[sel.ev].largo;
-  document.getElementById("sh-who").textContent = d.nombre + " · " + evs[sel.ev].comp;
+  document.getElementById("sh-who").textContent = d.nombre + " · " + evs[sel.ev].comp + (evs[sel.ev].limite ? " · plazo: " + evs[sel.ev].limite : "");
   document.getElementById("sh-opts").innerHTML = EST.map((t,k) =>
     '<button class="opt o' + k + '" type="button" data-est="' + k + '" aria-pressed="' + (e.estado === k) + '">' + t + '</button>').join("");
   document.getElementById("sh-opts").querySelectorAll(".opt").forEach(btn => btn.addEventListener("click", () => {
@@ -826,7 +890,7 @@ function modoLocal(){
   }));
   semanas = (g && Array.isArray(g.semanas)) ? g.semanas
     : SEED_SEM.map(s => Object.assign({id: s.mes + "__s" + s.orden}, s));
-  mesActivo = mesActivo || meses[0].id;
+  mesActivo = mesActivo || (meses.find(m => m.id === "2026-09") ? "2026-09" : meses[0].id);
   pintarTodo();
 }
 
@@ -835,7 +899,7 @@ function suscribir(store){
   const sub = (col, cb) => db.collection(col).onSnapshot(snap => {
     cb(snap.docs.map(d => Object.assign({id:d.id}, d.data())));
     if(meses.length && aprendices.length){
-      if(!mesActivo || !meses.some(m => m.id === mesActivo)) mesActivo = meses[0].id;
+      if(!mesActivo || !meses.some(m => m.id === mesActivo)) mesActivo = meses.find(m => m.id === "2026-09") ? "2026-09" : meses[meses.length-1].id;
       pintarTodo();
     }
   }, () => { aviso.hidden = false; aviso.textContent = "Se perdió la conexión con el tablero. Vuelve a cargar la página."; });
