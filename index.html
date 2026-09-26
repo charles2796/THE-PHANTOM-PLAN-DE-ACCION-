@@ -138,6 +138,24 @@ tfoot td.name{text-align:left;font-size:.78rem;font-weight:600;font-style:normal
 .hist-barra i.b4{background:var(--e4-bg)}
 .hist-pie{font-size:.75rem;color:var(--ink-2);margin-top:6px;font-style:italic}
 .caja.nuevo{border-left:6px solid var(--ink-2);border-style:dashed}
+.caja.destacados{border-left:6px solid var(--blue);margin-top:0;margin-bottom:14px}
+.caja.destacados h2{color:var(--blue)}
+.dest{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:9px}
+.dest-card{border:1px solid var(--line);border-radius:11px;padding:11px 12px;background:var(--bg)}
+.dest-card h3{font-size:.8rem;font-weight:700;margin:0 0 6px;color:var(--ink-2)}
+.dest-card .gran{font-family:Inter,sans-serif;font-weight:800;font-size:1.3rem;line-height:1.1;display:block}
+.dest-card ul{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:4px}
+.dest-card li{font-size:.82rem;line-height:1.3}
+.dest-card li em{font-style:italic;color:var(--ink-2);font-size:.76rem}
+.dest-card.ok{border-left:4px solid var(--e3-bg)}
+.dest-card.deb{border-left:4px solid var(--rojo)}
+.dest-card.cor{border-left:4px solid var(--orange)}
+.dest-card.otro{border-left:4px solid var(--e0-ink)}
+.mini-mes{font-size:.72rem;font-weight:700;color:var(--blue);background:var(--blue-soft);
+  border-radius:99px;padding:2px 8px;margin-left:5px}
+.evlist{list-style:none;margin:0 0 12px;padding:0;display:grid;gap:5px}
+.evlist li{font-size:.85rem;border:1px solid var(--line);border-radius:9px;padding:7px 10px;background:var(--bg)}
+.evlist li em{display:block;font-style:italic;font-size:.76rem;color:var(--ink-2)}
 .caja.turno h2{color:var(--orange)}
 .turnos{display:grid;grid-template-columns:1fr 1.35fr 1fr;gap:9px;align-items:center}
 @media (max-width:520px){.turnos{grid-template-columns:1fr;}}
@@ -156,6 +174,8 @@ tfoot td.name{text-align:left;font-size:.78rem;font-weight:600;font-style:normal
 .turno-card .cuando{font-size:.76rem;font-style:italic;opacity:.85;display:block;margin-top:3px}
 .form{display:grid;gap:10px}
 .form label{font-size:.8rem;color:var(--ink-2);font-style:italic;display:block;margin-bottom:4px}
+.form select.sel{width:100%;font:600 .9rem Switzer,"Plus Jakarta Sans",sans-serif;color:var(--ink);
+  background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px 10px}
 .form input{width:100%;font:400 .9rem Switzer,"Plus Jakarta Sans",sans-serif;color:var(--ink);
   background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px 10px}
 .form input:focus-visible{outline:2px solid var(--orange);outline-offset:1px}
@@ -168,6 +188,18 @@ tfoot td.name{text-align:left;font-size:.78rem;font-weight:600;font-style:normal
 .form button.sec{background:var(--panel);color:var(--ink-2);border:1px solid var(--line)}
 .form button:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
 .form .msg{font-size:.82rem;font-style:italic;color:var(--ink-2);margin:0}
+.tit.sub2{font-size:.95rem;margin:16px 0 8px}
+.form.bloque{border:1px solid var(--line);border-radius:11px;padding:12px;background:var(--bg);position:relative}
+.form.bloque .etq{font:700 .72rem Inter,sans-serif;color:var(--blue);text-transform:none;display:block}
+.evlist li{display:flex;gap:9px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.evlist li.edit{display:block}
+.ev-txt{min-width:0;flex:1}
+.acciones{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+.mini{font:600 .78rem Switzer,"Plus Jakarta Sans",sans-serif;background:var(--blue);color:#fff;
+  border:0;border-radius:8px;padding:8px 11px;cursor:pointer;white-space:nowrap}
+.mini.sec{background:var(--panel);color:var(--ink-2);border:1px solid var(--line)}
+.mini.del{background:var(--e4-bg);color:var(--e4-ink)}
+.mini:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
 .caja h2{font-size:1.06rem;font-weight:800;margin:0 0 2px}
 .caja.riesgo h2{color:#a82a12}
 .caja.aldia h2{color:#2a6b30}
@@ -277,6 +309,8 @@ footer a{color:var(--blue)}
   <div><div class="big" id="dias">—</div><div class="kicker" id="diaslab">para el corte</div></div>
   <p id="cortetxt">Los llamados de atención son individuales, quedan en el récord de seguimiento de la coordinación y no reemplazan el plan de acción.</p>
 </section>
+
+<section class="caja destacados" id="destacados"></section>
 
 <h2 class="tit">Estado general del grupo</h2>
 <p class="desc">Cuántas casillas hay en cada estado. Toca un estado, menos calificada, para ver de quién se trata.</p>
@@ -721,37 +755,289 @@ function pintarLideres(){
   caja.innerHTML = h;
 }
 
+function diasHasta(iso){
+  if(!iso) return null;
+  const p = iso.split("-").map(Number);
+  if(p.length !== 3) return null;
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  return Math.round((new Date(p[0], p[1]-1, p[2]) - hoy)/86400000);
+}
+function fechaLarga(iso){
+  if(!iso) return "";
+  const p = iso.split("-").map(Number);
+  return new Date(p[0], p[1]-1, p[2]).toLocaleDateString("es-CO", {day:"numeric", month:"long", year:"numeric"});
+}
+
+function pintarDestacados(){
+  const caja = document.getElementById("destacados");
+  const m = mesActual();
+  if(!m){ caja.innerHTML = '<h2>Destacados</h2><p class="vacio">Sin datos todavía.</p>'; return; }
+  const evs = evsDelMes(), filas = filasDelMes();
+  const ok = filas.filter(d => pend(d) === 0);
+  const deben = filas.filter(d => pend(d) > 0).sort((a,b) => pend(b) - pend(a));
+  const d = diasHasta(m.corte);
+
+  let h = '<h2>Destacados</h2><p class="cuenta">Lo importante de ' + esc(m.nombre.toLowerCase()) + ', de un vistazo.</p><div class="dest">';
+
+  h += '<div class="dest-card cor"><h3>Fecha de corte</h3><span class="gran">' +
+    (m.corte ? esc(fechaLarga(m.corte)) : "Sin definir") + '</span><ul><li><em>' +
+    (d === null ? "Agrega la fecha en la sección de abajo"
+      : d > 0 ? "faltan " + d + (d === 1 ? " día" : " días")
+      : d === 0 ? "es hoy" : "el corte ya pasó") + '</em></li></ul></div>';
+
+  h += '<div class="dest-card ok"><h3>Al día</h3><span class="gran">' + ok.length + ' de ' + filas.length +
+    '</span><ul>' + (ok.length ? ok.map(x => '<li>' + esc(x.nombre) + '</li>').join("")
+      : '<li><em>nadie tiene todo calificado</em></li>') + '</ul></div>';
+
+  h += '<div class="dest-card deb"><h3>Deben evidencias</h3><span class="gran">' + deben.length +
+    '</span><ul>' + (deben.length ? deben.map(x => '<li>' + esc(x.nombre) + ' <em>' + pend(x) +
+      (pend(x) === 1 ? " pendiente" : " pendientes") + '</em></li>').join("")
+      : '<li><em>nadie debe evidencias</em></li>') + '</ul></div>';
+
+  const otros = meses.filter(x => x.id !== m.id && Array.isArray(x.evidencias) && x.evidencias.length)
+    .sort((a,b) => (a.orden||0) - (b.orden||0));
+  let card = '<div class="dest-card otro"><h3>Actividad de otros meses</h3>';
+  if(!otros.length){
+    card += '<ul><li><em>no hay evidencias cargadas en otros meses</em></li></ul>';
+  }else{
+    card += '<ul>';
+    otros.forEach(x => {
+      const dd = diasHasta(x.corte);
+      card += '<li><b>' + esc(x.nombre) + '</b> <em>' + x.evidencias.length +
+        (x.evidencias.length === 1 ? " evidencia" : " evidencias") +
+        (x.corte ? " · corte " + esc(fechaLarga(x.corte)) +
+          (dd !== null && dd > 0 ? " (en " + dd + " días)" : dd === 0 ? " (hoy)" : " (cerrado)") : "") + '</em>';
+      x.evidencias.forEach(e => {
+        card += '<div style="font-size:.78rem;margin-top:3px">' + esc(e.corto) +
+          (e.limite ? ' <em>plazo: ' + esc(e.limite) + '</em>' : '') + '</div>';
+      });
+      card += '</li>';
+    });
+    card += '</ul>';
+  }
+  caja.innerHTML = h + card + '</div></div>';
+}
+
+function mesSiguienteId(){
+  let base = null;
+  meses.forEach(m => { if(!base || (m.orden||0) > (base.orden||0)) base = m; });
+  let y, mm;
+  if(base){
+    const p = base.id.split("-").map(Number);
+    y = p[0]; mm = p[1] + 1;
+    if(mm > 12){ mm = 1; y++; }
+  }else{
+    const hoy = new Date(); y = hoy.getFullYear(); mm = hoy.getMonth() + 2;
+    if(mm > 12){ mm = 1; y++; }
+  }
+  return y + "-" + (mm < 10 ? "0" + mm : mm);
+}
+function dosDig(n){ return n < 10 ? "0" + n : "" + n; }
+function limitesDelMes(mesId){
+  const p = mesId.split("-").map(Number);
+  const ultimo = new Date(p[0], p[1], 0).getDate();
+  return {
+    min: mesId + "-01",
+    max: mesId + "-" + dosDig(ultimo),
+    sugerido: mesId + "-" + dosDig(Math.min(29, ultimo))
+  };
+}
+function aplicarLimites(inputId, mesId, ponerValor){
+  const el = document.getElementById(inputId);
+  if(!el || !mesId) return;
+  const l = limitesDelMes(mesId);
+  el.min = l.min; el.max = l.max;
+  if(ponerValor || !el.value) el.value = l.sugerido;
+}
+
+let editando = null;   // índice de la evidencia que se está editando
+
 function pintarNuevo(){
   const caja = document.getElementById("nuevo");
   if(soloLectura){
-    caja.innerHTML = '<h2>Agregar un mes</h2><p class="vacio">Tu acceso no permite crear meses.</p>';
+    caja.innerHTML = '<h2>Evidencias y meses</h2><p class="vacio">Tu acceso no permite editar.</p>';
     return;
   }
-  caja.innerHTML = '<h2>Agregar un mes</h2>' +
-    '<p class="cuenta">Crea el mes con sus evidencias. Las semanas y el turno de liderazgo se calculan solos, siguiendo el bucle.</p>' +
-    '<div class="form">' +
+  const m = mesActual();
+  const evs = evsDelMes();
+  const sig = mesSiguienteId();
+  const p = sig.split("-").map(Number);
+  const nombreSig = MESES_ES[p[1]-1].charAt(0).toUpperCase() + MESES_ES[p[1]-1].slice(1) + " " + p[0];
+
+  let h = '<h2>Evidencias y meses</h2>' +
+    '<p class="cuenta">Crea y edita las evidencias de cada mes, sus plazos y la fecha de corte.</p>';
+
+  h += '<h3 class="tit sub2">Evidencias por mes</h3>';
+  h += '<div class="form"><div><label for="a-mes">Mes</label><select id="a-mes" class="sel">' +
+    meses.map(x => '<option value="' + x.id + '"' + (m && x.id === m.id ? ' selected' : '') + '>' +
+      esc(x.nombre) + '</option>').join("") + '</select></div></div>';
+
+  if(m){
+    h += '<div class="form bloque"><span class="etq">Editar mes</span>' +
       '<div class="fila">' +
-        '<div><label for="n-mes">Mes</label><input id="n-mes" type="month"></div>' +
+        '<div><label for="e-nom">Nombre del mes</label><input type="text" id="e-nom" value="' + esc(m.nombre) + '"></div>' +
+        '<div><label for="a-corte">Fecha de corte</label><input type="date" id="a-corte" value="' + esc(m.corte || "") + '"></div>' +
+      '</div>' +
+      '<button type="button" id="e-mes-btn">Guardar cambios del mes</button>' +
+      '<button type="button" class="sec" id="a-corte-btn">Guardar solo la fecha de corte</button>' +
+      '<p class="msg" id="e-msg"></p></div>';
+  }
+
+  h += '<ul class="evlist">';
+  if(!evs.length){
+    h += '<li><em>este mes todavía no tiene evidencias</em></li>';
+  }else{
+    evs.forEach((e,i) => {
+      if(editando === i){
+        h += '<li class="edit"><div class="fila tres">' +
+          '<input type="text" class="ed-nom" value="' + esc(e.corto) + '" placeholder="Nombre">' +
+          '<input type="text" class="ed-comp" value="' + esc(e.comp || "") + '" placeholder="Componente y código">' +
+          '<input type="text" class="ed-lim" value="' + esc(e.limite || "") + '" placeholder="Plazo de entrega">' +
+          '</div><div class="acciones">' +
+          '<button type="button" class="mini" data-guardar="' + i + '">Guardar evidencia</button>' +
+          '<button type="button" class="mini sec" data-cancelar="1">Cancelar</button>' +
+          '<button type="button" class="mini del" data-borrar="' + i + '">Eliminar</button>' +
+          '</div></li>';
+      }else{
+        h += '<li><div class="ev-txt"><b>' + esc(e.corto) + '</b><em>' + esc(e.comp || "") +
+          (e.limite ? ' · plazo: ' + esc(e.limite) : '') + '</em></div>' +
+          '<button type="button" class="mini sec" data-editar="' + i + '">Editar evidencia</button></li>';
+      }
+    });
+  }
+  h += '</ul>';
+
+  h += '<div class="form bloque"><span class="etq">Crear evidencia</span>' +
+    '<div class="fila tres">' +
+      '<input type="text" id="a-nom" placeholder="Nombre de la evidencia">' +
+      '<input type="text" id="a-comp" placeholder="Componente y código">' +
+      '<input type="text" id="a-lim" placeholder="Plazo de entrega">' +
+    '</div>' +
+    '<button type="button" id="a-add">Crear evidencia</button>' +
+    '<p class="msg" id="a-msg"></p></div>';
+
+  h += '<h3 class="tit sub2">Crear el mes siguiente</h3>' +
+    '<div class="form bloque">' +
+      '<p class="msg">Viene programado con ' + esc(nombreSig) + ', el mes que sigue al último creado.</p>' +
+      '<div class="fila">' +
+        '<div><label for="n-mes">Mes</label><input id="n-mes" type="month" value="' + sig + '"></div>' +
         '<div><label for="n-corte">Fecha del corte</label><input id="n-corte" type="date"></div>' +
       '</div>' +
-      '<div><label>Evidencias del mes: nombre, componente y plazo de entrega</label><div class="evs" id="n-evs"></div></div>' +
-      '<button type="button" class="sec" id="n-add">Agregar otra evidencia</button>' +
-      '<button type="button" id="n-crear">Crear mes</button>' +
+      '<div><label>Evidencias: nombre, componente y plazo de entrega</label><div class="evs" id="n-evs"></div></div>' +
+      '<button type="button" class="sec" id="n-add">Agregar otra línea de evidencia</button>' +
+      '<button type="button" id="n-crear">Crear mes siguiente</button>' +
       '<p class="msg" id="n-msg"></p>' +
     '</div>';
+  caja.innerHTML = h;
+
+  aplicarLimites("n-corte", sig, true);
+  document.getElementById("n-mes").addEventListener("change", e => {
+    if(e.target.value) aplicarLimites("n-corte", e.target.value, true);
+  });
+
+  const selMes = document.getElementById("a-mes");
+  if(selMes){
+    selMes.addEventListener("change", () => {
+      mesActivo = selMes.value; abierto = null; editando = null; pintarTodo();
+    });
+    document.getElementById("a-add").addEventListener("click", agregarEvidencia);
+  }
+  if(m){
+    aplicarLimites("a-corte", m.id, !m.corte);
+    document.getElementById("a-corte-btn").addEventListener("click", guardarCorte);
+    document.getElementById("e-mes-btn").addEventListener("click", guardarMes);
+  }
+  caja.querySelectorAll("[data-editar]").forEach(b => b.addEventListener("click", () => {
+    editando = +b.dataset.editar; pintarNuevo();
+  }));
+  caja.querySelectorAll("[data-cancelar]").forEach(b => b.addEventListener("click", () => {
+    editando = null; pintarNuevo();
+  }));
+  caja.querySelectorAll("[data-guardar]").forEach(b => b.addEventListener("click", () => guardarEvidencia(+b.dataset.guardar)));
+  caja.querySelectorAll("[data-borrar]").forEach(b => b.addEventListener("click", () => borrarEvidencia(+b.dataset.borrar)));
+
   const cont = document.getElementById("n-evs");
   const fila = () => {
     const d = document.createElement("div");
-    d.className = "fila";
     d.className = "fila tres";
     d.innerHTML = '<input type="text" class="n-nom" placeholder="Nombre de la evidencia">' +
       '<input type="text" class="n-comp" placeholder="Componente y código">' +
       '<input type="text" class="n-lim" placeholder="Plazo de entrega">';
     cont.appendChild(d);
   };
-  for(let i = 0; i < 4; i++) fila();
+  for(let i = 0; i < 2; i++) fila();
   document.getElementById("n-add").addEventListener("click", fila);
   document.getElementById("n-crear").addEventListener("click", crearMes);
+}
+
+async function guardarEvidencia(i){
+  const m = mesActual(); if(!m) return;
+  const li = document.querySelectorAll(".evlist li.edit")[0];
+  if(!li) return;
+  const nom = li.querySelector(".ed-nom").value.trim();
+  if(!nom){ return; }
+  const evs = (m.evidencias || []).slice();
+  evs[i] = {corto: nom, largo: nom,
+    comp: li.querySelector(".ed-comp").value.trim() || "Por definir",
+    limite: li.querySelector(".ed-lim").value.trim()};
+  m.evidencias = evs;
+  editando = null;
+  await guardar("meses", m.id, {orden:m.orden, nombre:m.nombre, corte:m.corte || "", evidencias:evs});
+  pintarTodo();
+}
+
+async function borrarEvidencia(i){
+  const m = mesActual(); if(!m) return;
+  const evs = (m.evidencias || []).slice();
+  evs.splice(i, 1);
+  m.evidencias = evs;
+  editando = null;
+  await guardar("meses", m.id, {orden:m.orden, nombre:m.nombre, corte:m.corte || "", evidencias:evs});
+  for(const r of registros.filter(x => x.mes === m.id)){
+    if(Array.isArray(r.evidencias) && r.evidencias.length > i){
+      r.evidencias.splice(i, 1);
+      await guardar("registros", r.id, {mes:r.mes, ap:r.ap, orden:r.orden, nota:r.nota || "", evidencias:r.evidencias});
+    }
+  }
+  pintarTodo();
+}
+
+async function guardarMes(){
+  const m = mesActual(); if(!m) return;
+  const nom = document.getElementById("e-nom").value.trim() || m.nombre;
+  const corte = document.getElementById("a-corte").value;
+  m.nombre = nom; m.corte = corte;
+  await guardar("meses", m.id, {orden:m.orden, nombre:nom, corte:corte, evidencias:m.evidencias || []});
+  pintarTodo();
+  const msg = document.getElementById("e-msg");
+  if(msg) msg.textContent = "Mes actualizado.";
+}
+
+async function agregarEvidencia(){
+  const msg = document.getElementById("a-msg");
+  const nom = document.getElementById("a-nom").value.trim();
+  const comp = document.getElementById("a-comp").value.trim();
+  const lim = document.getElementById("a-lim").value.trim();
+  if(!nom){ msg.textContent = "Escribe el nombre de la evidencia."; return; }
+  const m = mesActual(); if(!m) return;
+  const evs = (Array.isArray(m.evidencias) ? m.evidencias : []).slice();
+  evs.push({corto: nom, comp: comp || "Por definir", largo: nom, limite: lim});
+  m.evidencias = evs;
+  msg.textContent = "Guardando…";
+  await guardar("meses", m.id, {orden:m.orden, nombre:m.nombre, corte:m.corte || "", evidencias:evs});
+  pintarTodo();
+  const m2 = document.getElementById("a-msg");
+  if(m2) m2.textContent = "Evidencia creada y agregada al tablero.";
+}
+
+async function guardarCorte(){
+  const m = mesActual(); if(!m) return;
+  const v = document.getElementById("a-corte").value;
+  m.corte = v;
+  await guardar("meses", m.id, {orden:m.orden, nombre:m.nombre, corte:v, evidencias:m.evidencias || []});
+  pintarTodo();
+  const msg = document.getElementById("e-msg");
+  if(msg) msg.textContent = "Fecha de corte guardada.";
 }
 
 async function crearMes(){
@@ -759,7 +1045,7 @@ async function crearMes(){
   const mesVal = document.getElementById("n-mes").value;
   const corte = document.getElementById("n-corte").value;
   if(!mesVal){ msg.textContent = "Elige el mes."; return; }
-  if(meses.some(m => m.id === mesVal)){ msg.textContent = "Ese mes ya está creado."; return; }
+  if(meses.some(x => x.id === mesVal)){ msg.textContent = "Ese mes ya existe. Agrégale evidencias arriba."; return; }
   const evs = [];
   document.querySelectorAll("#n-evs .fila").forEach(f => {
     const nom = f.querySelector(".n-nom").value.trim();
@@ -767,7 +1053,6 @@ async function crearMes(){
     const lim = f.querySelector(".n-lim").value.trim();
     if(nom) evs.push({corto: nom, comp: comp || "Por definir", largo: nom, limite: lim});
   });
-  if(!evs.length){ msg.textContent = "Escribe al menos una evidencia."; return; }
   const p = mesVal.split("-").map(Number);
   const nombre = MESES_ES[p[1]-1].charAt(0).toUpperCase() + MESES_ES[p[1]-1].slice(1) + " " + p[0];
   const doc = {orden: p[0]*100 + p[1], nombre: nombre, corte: corte || "", evidencias: evs};
@@ -781,18 +1066,8 @@ async function crearMes(){
   if(m2) m2.textContent = "Mes creado. Ya puedes marcar las evidencias.";
 }
 
-function esSemanaActual(s, hoy){
-  const m = (s.rango || "").match(/^(\d+)\D+(\d+)/);
-  if(!m || !mesActivo) return false;
-  const p = mesActivo.split("-").map(Number);
-  const ini = new Date(p[0], p[1]-1, +m[1]);
-  const fin = new Date(p[0], p[1]-1, +m[2]);
-  if(fin < ini) fin.setMonth(fin.getMonth() + 1);
-  return hoy >= ini && hoy <= fin;
-}
-
 function pintarTodo(){
-  pintarMeses(); pintarCorte(); pintarStats(); pintarTabla();
+  pintarMeses(); pintarCorte(); pintarDestacados(); pintarStats(); pintarTabla();
   pintarHistorico(); pintarRiesgo(); pintarAlDia(); pintarTurno(); pintarLideres(); pintarNuevo();
 }
 
