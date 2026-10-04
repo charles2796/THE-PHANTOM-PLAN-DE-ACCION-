@@ -11,15 +11,22 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,600;0,700;0,800;1,400&family=Plus+Jakarta+Sans:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
 <style>
+/* Paleta base: #0D0D0D negro · #1C2340 navy · #3B4054 gris azul · #3D5C4A verde ·
+   #C25939 terracota · #E8A74B ocre · #ECD9AF arena · #F2E8CF crema · #FCA311 oro · #FFFFFF */
 :root{
-  --ink:#1d2430; --ink-2:#5f6b7c; --bg:#faf6ec; --panel:#fffdf7; --line:#e2dccd;
-  --blue:#12508f; --blue-soft:#dde8f6; --orange:#c2600f;
-  --e0-bg:#fffdf7;   --e0-ink:#6d7686;
-  --e1-bg:#f0a83f;   --e1-ink:#5c3002;
-  --e2-bg:#cfe9c9;   --e2-ink:#2f6b2c;
-  --e3-bg:#2f8f45;   --e3-ink:#ffffff;
-  --e4-bg:#f2b7ae;   --e4-ink:#8e2418;
-  --rojo:#c0331c;
+  --negro:#0d0d0d; --navy:#1c2340; --gris-azul:#3b4054; --verde:#3d5c4a;
+  --terracota:#c25939; --ocre:#e8a74b; --arena:#ecd9af; --crema:#f2e8cf; --oro:#fca311;
+  --night:#0d0d0d; --gris:#ecd9af; --gris-2:#f7f1e3;
+  --ink:#1c2340; --ink-2:#3b4054; --bg:#f2e8cf; --panel:#ffffff; --line:#e0d6bd;
+  --lemon:#e8a74b; --lemon-soft:#f6e3c2; --lemon-dark:#8a5a06;
+  --rose:#3d5c4a; --rose-soft:#ecd9af; --rose-dark:#2f4a3a;
+  --oro-soft:#f6e3c2; --oro-dark:#8a5a06; --blue:#1c2340; --blue-soft:#ecd9af;
+  --orange:#8a5a06; --rojo:#c25939;
+  --e0-bg:#ffffff;   --e0-ink:#3b4054;
+  --e1-bg:#e8a74b;   --e1-ink:#0d0d0d;
+  --e2-bg:#ecd9af;   --e2-ink:#3d5c4a;
+  --e3-bg:#3d5c4a;   --e3-ink:#ffffff;
+  --e4-bg:#0d0d0d;   --e4-ink:#e8a74b;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px);
   padding-bottom:env(safe-area-inset-bottom,0px);
@@ -29,36 +36,102 @@ html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:10
 body{margin:0;background:var(--bg);color:var(--ink);
   font-family:Switzer,"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   font-size:16px;line-height:1.5}
-.wrap{max-width:1000px;margin:0 auto;padding:18px 13px 70px}
+.wrap{max-width:1060px;margin:0 auto;padding:0 14px 80px}
+
+/* barra fija */
+.navbar{position:sticky;top:0;z-index:30;background:rgba(251,251,232,.92);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
+.nav-in{max-width:1060px;margin:0 auto;padding:9px 14px;display:flex;align-items:center;gap:14px}
+.brand{display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--ink);flex:0 0 auto}
+.brand .logo{height:30px;width:auto;margin:0}
+.brand span{font:800 .92rem/1.1 Inter,sans-serif}
+.brand small{display:block;font:400 .7rem Switzer,"Plus Jakarta Sans",sans-serif;font-style:italic;color:var(--ink-2)}
+.nav-links{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin-left:auto}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-links a{font:600 .82rem Switzer,"Plus Jakarta Sans",sans-serif;color:var(--ink-2);
+  text-decoration:none;padding:8px 11px;border-radius:99px;white-space:nowrap}
+.nav-links a:hover{background:var(--lemon-soft);color:var(--night)}
+.nav-links a.nav-cta{background:var(--night);color:var(--lemon)}
+.nav-links a:focus-visible{outline:2px solid var(--rose);outline-offset:2px}
+
+/* portada */
+.hero{background:var(--night);color:#fff;border-bottom:5px solid var(--lemon);margin-bottom:22px}
+.hero-in{max-width:1060px;margin:0 auto;padding:30px 14px 26px}
+@media (max-width:760px){.hero-in{padding:22px 14px}}
+.hero h1{font-size:clamp(1.6rem,5.4vw,2.5rem);font-weight:800;line-height:1.08;margin:.2em 0 .35em;color:#fff}
+.hero .sub{color:#d9dbd4;max-width:52ch}
+.eyebrow{display:block;font:600 .74rem Inter,sans-serif;letter-spacing:.08em;color:var(--lemon)}
+.hero .meses{margin:20px 0 0}
+.hero .mes{background:transparent;color:#d9dbd4;border-color:#3a3f36}
+.hero .mes:hover{border-color:var(--lemon)}
+.hero .mes[aria-pressed="true"]{background:var(--lemon);color:var(--night);border-color:var(--lemon)}
+.hero .corte{margin:0}
+
+/* encabezados de sección */
+.sec-head{margin:34px 0 12px}
+.sec-head .tit{margin:7px 0 3px;font-size:clamp(1.15rem,3.6vw,1.5rem)}
+.sec-head .desc{margin:0;max-width:62ch}
+.sec-head .eyebrow{color:var(--ink-2)}
+
+/* tarjetas con más aire */
+
+.stat,.slide{box-shadow:0 1px 2px rgba(0,0,0,.05)}
 h1,h2,h3,.num,.chip,th,.pcab b{font-family:Inter,system-ui,sans-serif;letter-spacing:-.012em}
-header.top{border-bottom:3px solid var(--orange);padding-bottom:12px;margin-bottom:14px}
-.logo{display:block;height:54px;width:auto;max-width:70%;margin:0 0 8px;object-fit:contain}
+
+
+
+
+.logo{display:block;height:34px;width:auto;object-fit:contain}
 .kicker{font-size:.79rem;color:var(--ink-2);font-style:italic}
 h1{font-size:clamp(1.4rem,6vw,1.95rem);font-weight:800;line-height:1.1;margin:.12em 0 .25em}
 .sub{color:var(--ink-2);font-size:.95rem;max-width:60ch;margin:0;font-style:italic}
 
 .meses{display:flex;gap:7px;flex-wrap:wrap;margin:14px 0 4px;align-items:center}
+html{scroll-behavior:smooth}
+:target{scroll-margin-top:72px}
 .mes{font:600 .85rem/1 Inter,sans-serif;color:var(--ink-2);background:var(--panel);
   border:1px solid var(--line);border-radius:99px;padding:9px 15px;cursor:pointer}
-.mes[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.mes[aria-pressed="true"]{background:var(--night);color:var(--lemon);border-color:var(--night)}
 .mes:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 .mes.add{border-style:dashed}
 
-.corte{display:flex;gap:13px;align-items:flex-start;border:1px solid transparent;
-  border-radius:13px;padding:13px 15px;margin:14px 0;color:#fff;background:#1d5fa5;
+.corte-linea{margin:12px 0 0;font-size:.78rem;font-style:italic;color:#aeb2a8;
+  transition:color .25s ease, font-size .25s ease;display:inline-block}
+.corte-linea:hover{color:var(--lemon);font-size:.84rem}
+.corte-linea.vencido:hover{color:var(--rose)}
+.corte{display:flex;gap:13px;align-items:flex-start;border:1px solid rgba(255,255,255,.14);
+  border-radius:13px;padding:13px 15px;margin:14px 0;color:#fff;background:var(--night);
   transition:background .4s ease}
-.corte .big{font-family:Inter;font-weight:800;font-size:1.75rem;line-height:1;color:#fff}
+.corte .big{font-family:Inter;font-weight:800;font-size:2rem;line-height:1;color:#fff}
+.corte.chico{padding:6px 0;gap:10px;align-items:baseline;margin:12px 0 0;border-radius:0;
+  max-width:700px;background:none !important;border:0 !important}
+/* sin fondo: el estado del corte se expresa en el color del texto */
+.corte.chico.n6 .big,.corte.chico.n5 .big{color:#fff}
+.corte.chico.n4 .big,.corte.chico.n3 .big{color:#e6ea52}
+.corte.chico.n2 .big{color:var(--lemon)}
+.corte.chico.n1 .big,.corte.chico.n0 .big{color:var(--rose)}
+.corte.chico.fin .big{color:#b9bcb3}
+.corte.chico .big,.corte.chico .kicker,.corte.chico p{transition:font-size .25s ease}
+.corte.chico .big{font-size:.92rem}
+.corte.chico .kicker{font-size:.66rem}
+.corte.chico p{font-size:.78rem;opacity:.85;line-height:1.3;white-space:nowrap}
+
+.corte.chico:hover .big{font-size:1.15rem}
+.corte.chico:hover .kicker{font-size:.72rem}
+.corte.chico:hover p{font-size:.88rem;opacity:1}
+@media (max-width:560px){.corte.chico{gap:8px}.corte.chico p{white-space:normal}}
 .corte .kicker{color:#fff;opacity:.9}
 .corte p{margin:0;font-size:.86rem;color:#fff;opacity:.92}
-.corte.n6{background:#1d5fa5} .corte.n5{background:#2f8f45} .corte.n4{background:#6c8c1f}
-.corte.n3{background:#b07c14} .corte.n2{background:#d2600f} .corte.n1{background:#c0331c}
-.corte.n0{background:#8f1707} .corte.fin{background:#48566a}
+.corte.n6{background:#0c0f0a} .corte.n5{background:#2b3324} .corte.n4{background:#56590a}
+.corte.n3{background:#8a8d00}
+.corte.n2 .big,.corte.n2 p,.corte.n2 .kicker{color:#0c0f0a} .corte.n2{background:#fbff12;color:#0c0f0a} .corte.n1{background:#ff206e}
+.corte.n0{background:#a8114b} .corte.fin{background:#5d6157}
 
 h2.tit{font-size:1.02rem;font-weight:800;margin:0 0 4px}
 p.desc{font-size:.84rem;color:var(--ink-2);margin:0 0 12px;font-style:italic}
 
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:8px;margin-bottom:8px}
-.stat{border:1px solid var(--line);border-radius:11px;padding:11px 13px;text-align:left;
+.stat{border:0;border-radius:0;padding:11px 13px;text-align:left;
   font-family:inherit;cursor:pointer;display:block;background:var(--e0-bg);color:var(--e0-ink)}
 .stat:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 .stat.e1{background:var(--e1-bg);color:var(--e1-ink);border-color:transparent}
@@ -69,11 +142,11 @@ p.desc{font-size:.84rem;color:var(--ink-2);margin:0 0 12px;font-style:italic}
 .stat.fijo{cursor:default}
 .stat .num{font-family:Inter;font-size:1.45rem;font-weight:800;line-height:1;color:inherit;display:block}
 .stat span{font-size:.79rem;color:inherit;opacity:.9;display:block;margin-top:2px}
-.detalle{background:var(--panel);border:1px solid var(--line);border-left:6px solid var(--line);
+.detalle{background:var(--gris-2);border:0;
   border-radius:11px;padding:12px 14px;margin-bottom:12px;font-size:.87rem}
-.detalle.d0{border-left-color:var(--e0-ink)} .detalle.d1{border-left-color:var(--e1-bg)}
-.detalle.d2{border-left-color:var(--e2-bg)} .detalle.d3{border-left-color:var(--e3-bg)}
-.detalle.d4{border-left-color:var(--e4-bg)}
+.detalle.d1{background:#fffde0} .detalle.d2{background:#fff5f8}
+.detalle.d3{background:#fff0f5} .detalle.d4{background:var(--night);color:#e7e9e2}
+.detalle.d4 h3{color:var(--lemon)} .detalle.d4 em{color:#b9bcb3}
 .detalle h3{font-size:.92rem;font-weight:700;margin:0 0 7px}
 .detalle ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .detalle li{display:flex;gap:8px;align-items:flex-start}
@@ -81,15 +154,16 @@ p.desc{font-size:.84rem;color:var(--ink-2);margin:0 0 12px;font-style:italic}
 .detalle p{margin:0;color:var(--ink-2)}
 
 .legend{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 8px}
-.chip{font-size:.72rem;font-weight:600;padding:5px 10px;border-radius:7px;border:1px solid var(--line)}
+.chip{font-size:.72rem;font-weight:600;padding:5px 10px;border-radius:0;border:0}
 .c0{background:var(--e0-bg);color:var(--e0-ink)}
 .c1{background:var(--e1-bg);color:var(--e1-ink);border-color:transparent}
 .c2{background:var(--e2-bg);color:var(--e2-ink);border-color:transparent}
 .c3{background:var(--e3-bg);color:var(--e3-ink);border-color:transparent}
 .c4{background:var(--e4-bg);color:var(--e4-ink);border-color:transparent}
 
-.scroll{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:13px;
-  -webkit-overflow-scrolling:touch}
+.scroll{overflow-x:auto;background:var(--panel);border:0;border-radius:0;
+  -webkit-overflow-scrolling:touch;
+  width:100vw;margin:0 calc(50% - 50vw);padding:0 max(16px, calc(50vw - 514px))}
 table{border-collapse:separate;border-spacing:0;width:100%;min-width:470px}
 th,td{border-bottom:1px solid var(--line);vertical-align:middle}
 thead th{position:sticky;top:0;z-index:3;background:var(--panel);font-size:.76rem;font-weight:700;
@@ -102,7 +176,7 @@ thead th.name{z-index:4;font-size:.86rem;color:var(--ink)}
 td.name{padding:11px 10px;font-size:1rem;font-weight:700;line-height:1.25}
 td.name small{display:block;font-weight:400;font-size:.8rem;color:var(--ink-2);margin-top:3px;font-style:italic}
 td.c{padding:5px}
-.cell{width:100%;min-height:44px;border:1px solid var(--line);border-radius:9px;
+.cell{width:100%;min-height:44px;border:1px solid var(--line);border-radius:4px;
   background:var(--e0-bg);color:var(--e0-ink);cursor:pointer;display:flex;align-items:center;
   justify-content:center;padding:6px 5px;font-family:inherit;text-align:center}
 .cell em{font-style:italic;font-size:.68rem;line-height:1.2;opacity:.92}
@@ -115,17 +189,39 @@ tr.riesgo td.name{box-shadow:1px 0 0 var(--line),inset 3px 0 0 var(--rojo)}
 tfoot td{font-size:.74rem;color:var(--ink-2);padding:7px 6px;text-align:center;border-bottom:0;font-style:italic}
 tfoot td.name{text-align:left;font-size:.78rem;font-weight:600;font-style:normal}
 
-.caja{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:14px 15px;margin-top:14px}
-.caja.riesgo{border-color:var(--e4-bg);border-left:6px solid var(--rojo)}
-.caja.aldia{border-color:var(--e2-bg);border-left:6px solid var(--e3-bg)}
-.caja.lideres{border-left:6px solid var(--blue)}
-.caja.turno{border-left:6px solid var(--orange)}
-.caja.historico{border-left:6px solid var(--e0-ink)}
-.hist{display:grid;gap:9px}
-.hist-fila{border:1px solid var(--line);border-radius:11px;padding:11px 12px;background:var(--bg);
+.caja{background:var(--panel);border:0;border-radius:0;
+  width:100vw;margin:0 calc(50% - 50vw);
+  padding:30px max(16px, calc(50vw - 514px)) 34px}
+.caja.riesgo{background:var(--navy);color:#fff}
+.caja.riesgo h2{color:var(--ocre)}
+.caja.riesgo .pcab b{color:#fff}
+.caja.riesgo .pdot{box-shadow:inset 0 0 0 1px #3a3f36}
+.caja.riesgo .cuenta,.caja.riesgo .vacio,.caja.riesgo .pev em{color:#c9cbc4}
+.caja.riesgo .plist > li{border-color:#2a2e26}
+.caja.riesgo .pnum{background:var(--ocre);color:var(--negro)}
+.caja.riesgo .pcaret{color:#c9cbc4}
+.caja.aldia{background:var(--arena)}
+.caja.aldia .pnum.ok{background:var(--verde);color:#fff}
+.caja.lideres{background:var(--panel);border-color:var(--line)}
+.caja.turno{background:var(--verde);color:#fff}
+.caja.turno .cuenta,.caja.turno .hist-pie{color:#d8e2da}
+.caja.turno .turno-card{background:rgba(255,255,255,.1);color:#fff}
+.caja.turno .turno-card.actual{background:var(--ocre);border-color:var(--ocre);color:var(--negro)}
+.caja.turno h2{color:var(--ocre)}
+.caja.historico{background:var(--negro);color:#fff}
+.caja.historico h2{color:var(--ocre)}
+.caja.historico .cuenta,.caja.historico .vacio{color:#b9bcb3}
+.caja.historico .hist-fila{border-bottom-color:#2a2e26;color:#e7e9e2}
+.caja.historico .hist-cab b{color:#fff}
+.caja.historico .hist-cab span,.caja.historico .hist-pie{color:#b9bcb3}
+.caja.historico .hist-barra{background:#2a2e26}
+.caja.historico .hist-fila.activo .hist-cab b{color:var(--ocre)}
+
+.hist{display:grid;gap:0}
+.hist-fila{border:0;border-bottom:1px solid var(--line);border-radius:0;padding:13px 1px;background:none;
   text-align:left;font-family:inherit;color:inherit;cursor:pointer;width:100%}
 .hist-fila:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
-.hist-fila.activo{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue)}
+.hist-fila.activo .hist-cab b{color:var(--rose-dark)}
 .hist-cab{display:flex;justify-content:space-between;align-items:baseline;gap:9px}
 .hist-cab b{font-family:Inter,sans-serif;font-weight:700;font-size:.95rem}
 .hist-cab span{font-size:.78rem;color:var(--ink-2);font-style:italic}
@@ -137,73 +233,121 @@ tfoot td.name{text-align:left;font-size:.78rem;font-weight:600;font-style:normal
 .hist-barra i.b3{background:var(--e3-bg)}
 .hist-barra i.b4{background:var(--e4-bg)}
 .hist-pie{font-size:.75rem;color:var(--ink-2);margin-top:6px;font-style:italic}
-.caja.nuevo{border-left:6px solid var(--ink-2);border-style:dashed}
-.caja.destacados{border-left:6px solid var(--blue);margin-top:0;margin-bottom:14px}
-.caja.destacados h2{color:var(--blue)}
-.dest{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:9px}
+.caja.nuevo{position:relative;background:var(--panel);overflow:hidden;padding-top:38px}
+.caja.nuevo::before{content:"";position:absolute;inset:0 0 auto 0;height:7px;
+  background:linear-gradient(90deg,var(--ocre) 0%,var(--ocre) 34%,var(--terracota) 34%,var(--terracota) 67%,var(--verde) 67%,var(--verde) 100%)}
+.caja.nuevo h2{color:var(--night)}
+.destacados.en-hero{margin:18px 0 0;max-width:760px}
+.destacados.en-hero h2{color:#fff;font-size:.9rem;font-weight:700;margin:0 0 8px;opacity:.75}
+.destacados.en-hero .puntos{justify-content:flex-start}
+
+.slider{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px}
+.slider::-webkit-scrollbar{display:none}
+.slide{flex:0 0 100%;scroll-snap-align:start;border-radius:0;padding:15px 16px;min-height:150px;
+  border:1px solid transparent;transition:background .4s ease}
+.slide-mes{display:block;font-size:.72rem;font-style:italic;opacity:.75;margin-bottom:6px}
+.slide h3{font-size:.82rem;font-weight:700;margin:0 0 6px;opacity:.85}
+.slide .gran{font-family:Inter,sans-serif;font-weight:800;font-size:1.45rem;line-height:1.1;display:block}
+.slide ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:4px}
+.slide li{font-size:.84rem;line-height:1.3}
+.slide em{font-style:italic;opacity:.8;font-size:.78rem}
+.slide .sub-ev{font-size:.78rem;margin-top:3px;opacity:.9}
+.slide.t-corte{background:var(--ocre);color:var(--negro)}
+.slide.t-ok{background:var(--arena);color:var(--verde)}
+.slide.t-deb{background:var(--terracota);color:#fff}
+.slide.t-otro{background:var(--navy);color:#fff}
+.puntos{display:flex;gap:6px;justify-content:center;margin-top:10px}
+.punto{width:9px;height:9px;border-radius:99px;border:0;padding:0;cursor:pointer;opacity:.35;
+  transition:opacity .2s, width .2s}
+.punto.on{opacity:1;width:22px}
+.punto.t-corte{background:var(--ocre)}
+.punto.t-ok{background:var(--arena)}
+.punto.t-deb{background:var(--terracota)}
+.punto.t-otro{background:var(--navy)}
+.punto:focus-visible{outline:2px solid var(--night);outline-offset:2px}
 .dest-card{border:1px solid var(--line);border-radius:11px;padding:11px 12px;background:var(--bg)}
 .dest-card h3{font-size:.8rem;font-weight:700;margin:0 0 6px;color:var(--ink-2)}
 .dest-card .gran{font-family:Inter,sans-serif;font-weight:800;font-size:1.3rem;line-height:1.1;display:block}
 .dest-card ul{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:4px}
 .dest-card li{font-size:.82rem;line-height:1.3}
 .dest-card li em{font-style:italic;color:var(--ink-2);font-size:.76rem}
-.dest-card.ok{border-left:4px solid var(--e3-bg)}
-.dest-card.deb{border-left:4px solid var(--rojo)}
-.dest-card.cor{border-left:4px solid var(--orange)}
-.dest-card.otro{border-left:4px solid var(--e0-ink)}
+
+
+
+
 .mini-mes{font-size:.72rem;font-weight:700;color:var(--blue);background:var(--blue-soft);
   border-radius:99px;padding:2px 8px;margin-left:5px}
-.evlist{list-style:none;margin:0 0 12px;padding:0;display:grid;gap:5px}
-.evlist li{font-size:.85rem;border:1px solid var(--line);border-radius:9px;padding:7px 10px;background:var(--bg)}
+.evlist{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:0}
+.evlist li{font-size:.88rem;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:11px 1px;background:none}
 .evlist li em{display:block;font-style:italic;font-size:.76rem;color:var(--ink-2)}
-.caja.turno h2{color:var(--orange)}
+
 .turnos{display:grid;grid-template-columns:1fr 1.35fr 1fr;gap:9px;align-items:center}
 @media (max-width:520px){.turnos{grid-template-columns:1fr;}}
-.turno-card{border:1px solid var(--line);border-radius:12px;padding:11px 12px;background:var(--bg);
+.turno-card{border:0;border-radius:0;padding:12px 14px;background:rgba(0,0,0,.04);
   border-radius:12px !important}
 .turno-card .quien{font-size:.92rem}
 .turno-card .cuando{font-size:.72rem}
+.turno-card{transition:opacity .25s ease, transform .25s ease}
+.turnos:hover .turno-card:not(.actual){opacity:.3}
+.turnos:hover .turno-card.actual{transform:scale(1.03)}
 .turno-card.actual{padding:16px 15px}
 .turno-card.actual .rol{font-size:.76rem;opacity:.95}
 .turno-card.actual .quien{font-size:1.2rem}
 .turno-card.actual .cuando{font-size:.8rem;opacity:.95}
-.turno-card.actual{background:var(--blue);border-color:var(--blue);color:#fff}
+.turno-card.actual{background:var(--night);border-color:var(--night);color:#fff}
 .turno-card .rol{font-size:.72rem;font-weight:700;text-transform:none;letter-spacing:.02em;
   font-family:Inter,sans-serif;opacity:.8;display:block;margin-bottom:4px}
 .turno-card .quien{font-family:Inter,sans-serif;font-weight:800;font-size:1rem;line-height:1.2;display:block}
 .turno-card .cuando{font-size:.76rem;font-style:italic;opacity:.85;display:block;margin-top:3px}
 .form{display:grid;gap:10px}
-.form label{font-size:.8rem;color:var(--ink-2);font-style:italic;display:block;margin-bottom:4px}
-.form select.sel{width:100%;font:600 .9rem Switzer,"Plus Jakarta Sans",sans-serif;color:var(--ink);
-  background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px 10px}
-.form input{width:100%;font:400 .9rem Switzer,"Plus Jakarta Sans",sans-serif;color:var(--ink);
-  background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px 10px}
-.form input:focus-visible{outline:2px solid var(--orange);outline-offset:1px}
+.form label{font-size:.74rem;color:var(--ink-2);font-style:italic;display:block;margin-bottom:2px;
+  letter-spacing:.02em}
+.form select.sel{width:100%;font:700 1rem Inter,sans-serif;color:var(--ink);
+  background:transparent;border:0;border-bottom:1.5px solid var(--night);border-radius:0;padding:6px 1px;
+  appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--ink) 50%),linear-gradient(135deg,var(--ink) 50%,transparent 50%);
+  background-position:calc(100% - 13px) 55%,calc(100% - 8px) 55%;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+.form select.sel:focus{outline:none;border-bottom-color:var(--rose)}
+.form input{width:100%;font:400 .92rem Switzer,"Plus Jakarta Sans",sans-serif;color:var(--ink);
+  background:transparent;border:0;border-bottom:1.5px solid var(--line);border-radius:0;padding:7px 1px;
+  transition:border-color .2s ease}
+.form input:hover{border-bottom-color:#c9c9ae}
+.form input:focus{outline:none;border-bottom-color:var(--rose)}
 .form .fila{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.form .fila.tres{grid-template-columns:1.2fr 1fr .9fr}
+.form .fila.tres{grid-template-columns:1.2fr 1fr .9fr;align-items:end}
+.campo label{display:block;font-size:.72rem;color:var(--ink-2);font-style:italic;margin-bottom:3px}
 @media (max-width:560px){.form .fila,.form .fila.tres{grid-template-columns:1fr}}
 .form .evs{display:grid;gap:7px}
-.form button{font:600 .9rem Switzer,"Plus Jakarta Sans",sans-serif;background:var(--blue);color:#fff;
-  border:0;border-radius:9px;padding:11px;cursor:pointer}
-.form button.sec{background:var(--panel);color:var(--ink-2);border:1px solid var(--line)}
+.form button{font:600 .88rem Switzer,"Plus Jakarta Sans",sans-serif;background:var(--night);color:var(--lemon);
+  border:0;border-radius:99px;padding:11px 20px;cursor:pointer;justify-self:start;transition:opacity .2s}
+.form button:hover{opacity:.85}
+.form button.sec{background:none;color:var(--ink-2);border:0;border-bottom:1.5px solid var(--line);
+  border-radius:0;padding:7px 1px;justify-self:start}
+.form button.sec:hover{color:var(--ink);border-bottom-color:var(--rose)}
 .form button:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
 .form .msg{font-size:.82rem;font-style:italic;color:var(--ink-2);margin:0}
+.ejemplo{border:1px dashed var(--line);border-radius:10px;padding:10px 12px;background:var(--panel);font-size:.83rem}
+.ejemplo b{display:block;font-family:Inter,sans-serif;font-size:.85rem}
+.ejemplo span{display:block;color:var(--ink-2);font-style:italic;font-size:.78rem;margin:3px 0 6px}
+.ejemplo ul{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.ejemplo li{font-size:.82rem}
+.ejemplo em{font-style:normal;font-weight:600;color:var(--blue)}
 .tit.sub2{font-size:.95rem;margin:16px 0 8px}
-.form.bloque{border:1px solid var(--line);border-radius:11px;padding:12px;background:var(--bg);position:relative}
-.form.bloque .etq{font:700 .72rem Inter,sans-serif;color:var(--blue);text-transform:none;display:block}
+.form.bloque{border:0;border-top:1px solid var(--line);border-radius:0;padding:15px 0 0;background:none;margin-top:15px}
+.form.bloque .etq{font:600 .72rem Inter,sans-serif;color:var(--ink-2);letter-spacing:.06em;display:block;margin-bottom:4px}
 .evlist li{display:flex;gap:9px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 .evlist li.edit{display:block}
 .ev-txt{min-width:0;flex:1}
 .acciones{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
-.mini{font:600 .78rem Switzer,"Plus Jakarta Sans",sans-serif;background:var(--blue);color:#fff;
+.mini{font:600 .78rem Switzer,"Plus Jakarta Sans",sans-serif;background:var(--night);color:var(--lemon);
   border:0;border-radius:8px;padding:8px 11px;cursor:pointer;white-space:nowrap}
-.mini.sec{background:var(--panel);color:var(--ink-2);border:1px solid var(--line)}
-.mini.del{background:var(--e4-bg);color:var(--e4-ink)}
+.mini.sec{background:none;color:var(--ink-2);border:0;text-decoration:underline;text-underline-offset:3px;padding:8px 2px}
+.mini.del{background:none;color:var(--rose-dark);border:0;text-decoration:underline;text-underline-offset:3px;padding:8px 2px}
 .mini:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
 .caja h2{font-size:1.06rem;font-weight:800;margin:0 0 2px}
-.caja.riesgo h2{color:#a82a12}
-.caja.aldia h2{color:#2a6b30}
-.caja.lideres h2{color:var(--blue)}
+.caja.riesgo h2{color:var(--ocre)}
+.caja.aldia h2{color:var(--verde)}
+.caja.lideres h2{color:var(--rose-dark)}
 .caja .cuenta,.caja .vacio{font-size:.85rem;color:var(--ink-2);margin:0 0 12px;font-style:italic}
 .caja .vacio{margin:0}
 .plist{list-style:none;margin:0;padding:0}
@@ -218,7 +362,7 @@ tfoot td.name{text-align:left;font-size:.78rem;font-weight:600;font-style:normal
 .pcab{display:flex;justify-content:space-between;gap:9px;align-items:baseline;flex:1;min-width:0}
 .pcab b{font-weight:700;font-size:.96rem}
 .pnum{font-size:.74rem;font-weight:600;padding:3px 9px;border-radius:99px;white-space:nowrap;
-  color:var(--e4-ink);background:var(--e4-bg)}
+  color:var(--lemon);background:var(--night)}
 .pnum.ok{color:var(--e2-ink);background:var(--e2-bg)}
 .plist ul{list-style:none;margin:0 0 12px;padding:0 2px;display:grid;gap:6px}
 .pev{display:flex;gap:8px;align-items:flex-start;font-size:.85rem}
@@ -230,12 +374,12 @@ tfoot td.name{text-align:left;font-size:.78rem;font-weight:600;font-style:normal
 .pdot.s3{background:var(--e3-bg);box-shadow:none}
 .pdot.s4{background:var(--e4-bg);box-shadow:none}
 
-.sem{display:grid;gap:9px}
-.cal{display:grid;gap:7px;margin-top:4px}
-.cal-cab{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:0 4px}
+.sem{display:grid;gap:0}
+.cal{display:grid;gap:0;margin-top:4px}
+.cal-cab{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:0 8px 4px}
 .cal-cab span{font-size:.7rem;font-style:italic;color:var(--ink-2);text-align:center}
-.cal-sem{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:7px 6px 8px;
-  border-radius:11px;background:var(--ls);border:1px solid var(--lf);border-left-width:5px}
+.cal-sem{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:9px 8px 10px;
+  border-radius:0;background:var(--ls);border:0;border-bottom:1px solid rgba(0,0,0,.08)}
 .cal-sem .dia{display:flex;align-items:center;justify-content:center;height:30px;border-radius:7px;
   font-size:.82rem;font-weight:600;color:var(--ink-2);background:transparent}
 .cal-sem .dia.habil{background:var(--lf);color:#fff}
@@ -250,20 +394,20 @@ tfoot td.name{text-align:left;font-size:.78rem;font-weight:600;font-style:normal
 .cal-chip i{width:9px;height:9px;border-radius:3px;background:var(--lf);display:block}
 .cal-chip.off{opacity:.45}
 .semana{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;
-  border:1px solid var(--line);border-radius:11px;padding:10px 12px;background:var(--bg)}
-.semana.activa{border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue);background:var(--blue-soft)}
+  border:0;border-bottom:1px solid var(--line);border-radius:0;padding:11px 1px;background:none}
+.semana.activa{border-bottom-color:var(--rose)}
 .semana b{font-size:.92rem;font-weight:700;font-family:Inter,sans-serif;display:block}
 .semana em{font-style:italic;font-size:.78rem;color:var(--ink-2);display:block}
-.quien-sem{font:700 .92rem Inter,sans-serif;color:var(--ink);background:var(--panel);
-  border:1px solid var(--line);border-radius:9px;padding:8px 12px;white-space:nowrap}
-.semana.activa .quien-sem{background:#fff;border-color:var(--blue);color:var(--blue)}
-.ahora{font-size:.68rem;font-weight:700;color:#fff;background:var(--blue);
+.quien-sem{font:700 .92rem Inter,sans-serif;color:var(--ink);background:none;
+  border:0;padding:8px 2px;white-space:nowrap}
+.semana.activa .quien-sem{color:var(--rose-dark)}
+.ahora{font-size:.68rem;font-weight:700;color:var(--night);background:var(--rose);
   border-radius:99px;padding:2px 8px;margin-left:7px;vertical-align:middle}
 
-.nota{font-size:.84rem;color:var(--fix,#a82a12);background:var(--e4-bg);border:1px solid var(--e4-bg);
-  border-left:6px solid var(--rojo);border-radius:11px;padding:11px 13px;margin-top:12px}
-.nota strong{color:var(--e4-ink)}
-.aviso{background:var(--panel);border:1px dashed var(--line);border-radius:11px;
+.nota{font-size:.88rem;color:var(--negro);background:var(--ocre);border:0;border-radius:0;
+  width:100vw;margin:0 calc(50% - 50vw);padding:16px max(16px, calc(50vw - 514px))}
+.nota strong{color:#000}
+.aviso{background:var(--oro-soft);border:0;border-radius:0;
   padding:11px 13px;font-size:.85rem;color:var(--ink-2);margin:12px 0}
 .hint{font-size:.84rem;color:var(--ink-2);margin:0 0 10px;font-style:italic}
 
@@ -288,40 +432,61 @@ tfoot td.name{text-align:left;font-size:.78rem;font-weight:600;font-style:normal
   background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:10px}
 .fecha input:focus-visible{outline:2px solid var(--orange);outline-offset:1px}
 .cerrar{margin-top:14px;width:100%;font:600 .9rem Switzer,"Plus Jakarta Sans",sans-serif;
-  background:var(--blue);color:#fff;border:0;border-radius:9px;padding:12px;cursor:pointer}
+  background:var(--night);color:var(--lemon);border:0;border-radius:9px;padding:12px;cursor:pointer}
 footer{margin-top:24px;padding-top:13px;border-top:1px solid var(--line);font-size:.83rem;color:var(--ink-2)}
+footer .copy{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:.78rem}
+footer .copy a{color:var(--ink);text-decoration:none;border-bottom:1.5px solid var(--rose);
+  padding-bottom:1px;transition:color .2s ease, border-color .2s ease}
+footer .copy a:hover{color:var(--rose-dark)}
 footer a{color:var(--blue)}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
-<div class="wrap">
-<header class="top">
-  <img id="logo" class="logo" src="logo.png" alt="The Phantom Frame Studios" onerror="this.remove()">
-  <div class="kicker">The Phantom Frame Studios</div>
-  <h1>Tablero de evidencias</h1>
-  <p class="sub">Seguimiento mes a mes: estado de cada evidencia, quiénes van al día, quiénes están en riesgo y a quién le toca liderar la semana.</p>
+
+<nav class="navbar" aria-label="Secciones">
+  <div class="nav-in">
+    <a class="brand" href="#inicio">
+      <img id="logo" class="logo" src="logo.png" alt="" onerror="this.remove()">
+      <span>The Phantom Frame<small>Tablero de evidencias</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="#tablero">Tablero</a>
+      <a href="#riesgo">En riesgo</a>
+      <a href="#aldia">Al día</a>
+      <a href="#turno">Liderazgo</a>
+      <a href="#historico">Histórico</a>
+      <a href="#nuevo" class="nav-cta">Editar evidencias</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="inicio">
+  <div class="hero-in">
+    <div class="hero-txt">
+      <span class="eyebrow">Fase AP4 · seguimiento mensual</span>
+      <h1>Cada evidencia, en su estado y a tiempo</h1>
+      <p class="sub">Mira el estado de cada aprendiz, quién está al día, quién tiene plazos vencidos y a quién le toca liderar la semana.</p>
+      <section class="destacados en-hero" id="destacados"></section>
+      <p class="corte-linea" id="corte"></p>
+      <div class="meses" id="meses"></div>
+    </div>
+  </div>
 </header>
 
-<div class="meses" id="meses"></div>
+<div class="wrap">
 
-<section class="corte" id="corte">
-  <div><div class="big" id="dias">—</div><div class="kicker" id="diaslab">para el corte</div></div>
-  <p id="cortetxt">Los llamados de atención son individuales, quedan en el récord de seguimiento de la coordinación y no reemplazan el plan de acción.</p>
-</section>
 
-<section class="caja destacados" id="destacados"></section>
-
-<h2 class="tit">Estado general del grupo</h2>
-<p class="desc">Cuántas casillas hay en cada estado. Toca un estado, menos calificada, para ver de quién se trata.</p>
+<div class="sec-head"><span class="eyebrow">Resumen</span>
+  <h2 class="tit">Estado general del grupo</h2>
+  <p class="desc">Cuántas casillas hay en cada estado. Toca un estado, menos calificada, para ver de quién se trata.</p></div>
 <div class="stats" id="stats"></div>
 <div class="detalle" id="detalle" hidden></div>
 
-<h2 class="tit">Estado de entrega</h2>
+<div class="sec-head" id="tablero"><span class="eyebrow">Seguimiento</span>
+  <h2 class="tit">Estado de entrega</h2>
+  <p class="desc">Cada casilla toma el color del estado en que va la evidencia. Tócala para cambiarlo o anotar tu fecha de entrega.</p></div>
 <div class="legend" id="legend"></div>
-<p class="desc">Cada casilla del tablero toma el color del estado en que va la evidencia.</p>
-
-<p class="hint">Cada casilla es un color. Tócala para cambiar el estado o anotar tu fecha de entrega.</p>
 <div class="aviso" id="aviso" hidden></div>
 <div class="scroll"><table id="tabla"><tbody><tr><td class="name">Cargando…</td></tr></tbody></table></div>
 
@@ -336,6 +501,9 @@ footer a{color:var(--blue)}
 <footer>
   <p>El tablero se guarda solo. Si dos personas marcan la misma casilla, queda la última marca.</p>
   <p><a href="https://docs.google.com/spreadsheets/d/1D5LXlUyQsRZR3R079EtaUNdvaKQ7tIio9TpGUUI8BYU/edit?usp=sharing">Abrir la hoja de seguimiento</a></p>
+  <p class="copy">© <span id="anio"></span> Diseñado y desarrollado por
+    <a href="https://www.linkedin.com/in/charles-co27/" target="_blank" rel="noopener">Jhann Charles Corredor Jaimes</a>.
+    Todos los derechos reservados.</p>
 </footer>
 </div>
 
@@ -354,7 +522,7 @@ footer a{color:var(--blue)}
 
 <script>
 const EST = ["Sin novedad","En desarrollo","Se entrega","Calificada","No entregado"];
-const LLAVE = "phantom-evidencias-v2";
+const LLAVE = "phantom-evidencias-v3";
 
 const SEED_MESES = [
   {id:"2026-08", orden:202608, nombre:"Agosto 2026", corte:"", evidencias:[]},
@@ -364,12 +532,7 @@ const SEED_MESES = [
     {corto:"Video de cámara tracking", comp:"Técnico · GA4-220501084-AA1-EV03", largo:"Video de cámara tracking"},
     {corto:"Conceptos de biología", comp:"Biología · GA4-220201501-AA1-EV01", largo:"Conceptos básicos de la biología que componen el entorno vivo"}
   ]},
-  {id:"2026-10", orden:202610, nombre:"Octubre 2026", corte:"2026-10-29", evidencias:[
-    {corto:"Evidencia 1", comp:"Por definir", largo:"Evidencia 1 de octubre"},
-    {corto:"Evidencia 2", comp:"Por definir", largo:"Evidencia 2 de octubre"},
-    {corto:"Evidencia 3", comp:"Por definir", largo:"Evidencia 3 de octubre"},
-    {corto:"Evidencia 4", comp:"Por definir", largo:"Evidencia 4 de octubre"}
-  ]}
+  {id:"2026-10", orden:202610, nombre:"Octubre 2026", corte:"2026-10-29", evidencias:[]}
 ];
 const SEED_APR = [
   {id:"ap1", orden:1, nombre:"Yonalis Contreras García"},
@@ -383,16 +546,16 @@ const SEED_APR = [
   {id:"ap9", orden:9, nombre:"Sergio Perdomo"}
 ];
 const SEED_SEP = {
-  ap1:{ev:[3,3,1,1], f:["","","","27 de septiembre, 12:00 p. m."]},
+  ap1:{ev:[3,3,2,2], f:["","","26 de septiembre, 12:00 p. m.","27 de septiembre, 12:00 p. m."]},
   ap2:{ev:[3,3,3,3], f:["","","",""]},
   ap3:{ev:[3,3,3,3], f:["","","",""]},
-  ap4:{ev:[3,3,1,3], f:["","","26 de septiembre, 12:00 p. m.",""]},
-  ap5:{ev:[3,3,1,1], f:["","","26 de septiembre, 12:00 p. m.","27 de septiembre, 12:00 p. m."]},
+  ap4:{ev:[3,3,3,3], f:["","","26 de septiembre, 12:00 p. m.",""]},
+  ap5:{ev:[3,3,3,2], f:["","","26 de septiembre, 12:00 p. m.","27 de septiembre, 12:00 p. m."]},
   ap6:{ev:[3,3,3,3], f:["","","",""]},
-  ap7:{ev:[3,3,3,1], f:["","","","27 de septiembre, 12:00 p. m."]},
-  ap8:{ev:[4,4,4,4], f:["","","26 de septiembre, 12:00 p. m.","27 de septiembre, 12:00 p. m."],
+  ap7:{ev:[3,3,3,3], f:["","","","27 de septiembre, 12:00 p. m."]},
+  ap8:{ev:[3,3,4,2], f:["","","26 de septiembre, 12:00 p. m.","27 de septiembre, 12:00 p. m."],
        nota:"No responde a los llamados por correo ni por WhatsApp, individual o grupal."},
-  ap9:{ev:[3,3,1,1], f:["","","26 de septiembre, 12:00 p. m.","27 de septiembre, 12:00 p. m."]}
+  ap9:{ev:[3,3,2,2], f:["","","26 de septiembre, 12:00 p. m.","27 de septiembre, 12:00 p. m."]}
 };
 const SEED_SEM = [
   {mes:"2026-08", orden:1, etiqueta:"Semana 1", rango:"24 al 28 de agosto", lider:"ap6"},
@@ -435,6 +598,30 @@ function filasDelMes(){
   });
 }
 const pend = f => f.evidencias.filter(e => e.estado !== 3).length;
+const SIN_REPORTE = [0, 4];   // sin novedad y no entregado
+const sinReporte = f => f.evidencias.filter(e => SIN_REPORTE.indexOf(e.estado) !== -1).length;
+function esISO(v){ return /^\d{4}-\d{2}-\d{2}$/.test(v || ""); }
+function plazoVencido(i){
+  // vencida solo si ya pasó el plazo de esa evidencia; si no tiene plazo, se usa la fecha de corte del mes
+  const m = mesActual(); if(!m) return false;
+  const ev = (m.evidencias || [])[i]; if(!ev) return false;
+  const ref = esISO(ev.limite) ? ev.limite : (esISO(m.corte) ? m.corte : null);
+  if(!ref) return false;
+  const p = ref.split("-").map(Number);
+  const elAnio = document.getElementById("anio");
+if(elAnio) elAnio.textContent = new Date().getFullYear();
+
+const hoy = new Date(); hoy.setHours(0,0,0,0);
+  return new Date(p[0], p[1]-1, p[2]) < hoy;
+}
+function vencidasSinReporte(f){
+  return f.evidencias.filter((e,i) => SIN_REPORTE.indexOf(e.estado) !== -1 && plazoVencido(i)).length;
+}
+const hayEvidencias = () => evsDelMes().length > 0;
+function textoPlazo(v){
+  if(!v) return "";
+  return /^\d{4}-\d{2}-\d{2}$/.test(v) ? fechaLarga(v) : v;
+}
 
 function pintarMeses(){
   document.getElementById("meses").innerHTML = meses.map(m =>
@@ -447,27 +634,18 @@ function pintarMeses(){
 
 function pintarCorte(){
   const m = mesActual(); if(!m) return;
-  const caja = document.getElementById("corte");
+  const el = document.getElementById("corte");
+  if(!el) return;
   const hoy = new Date(); hoy.setHours(0,0,0,0);
   const p = (m.corte || "").split("-").map(Number);
   const f = p.length === 3 ? new Date(p[0], p[1]-1, p[2]) : null;
-  const elD = document.getElementById("dias"), elL = document.getElementById("diaslab");
-  caja.className = "corte";
-  if(!f){ elD.textContent = "—"; elL.textContent = "sin fecha de corte"; caja.classList.add("fin"); }
-  else{
-    const dias = Math.round((f - hoy)/86400000);
-    let nivel = "fin";
-    if(dias > 0){
-      elD.textContent = dias; elL.textContent = dias === 1 ? "día para el corte" : "días para el corte";
-      nivel = dias >= 8 ? "n6" : dias >= 6 ? "n5" : dias >= 5 ? "n4" : dias >= 4 ? "n3"
-            : dias === 3 ? "n2" : dias === 2 ? "n1" : "n0";
-    }else if(dias === 0){ elD.textContent = "Hoy"; elL.textContent = "es el corte"; nivel = "n0"; }
-    else { elD.textContent = "Cerrado"; elL.textContent = "el corte ya pasó"; nivel = "fin"; }
-    caja.classList.add(nivel);
-  }
-  const fmt = f ? f.toLocaleDateString("es-CO", {day:"numeric", month:"long", year:"numeric"}) : "sin definir";
-  document.getElementById("cortetxt").textContent =
-    "Corte de " + m.nombre.toLowerCase() + ": " + fmt + ". Se verifica toda la fase. Los llamados de atención son individuales, quedan en el récord de seguimiento de la coordinación y no reemplazan el plan de acción.";
+  el.className = "corte-linea";
+  if(!f){ el.textContent = "Sin fecha de corte"; return; }
+  const fecha = f.toLocaleDateString("es-CO", {day:"numeric", month:"long"});
+  const dias = Math.round((f - hoy)/86400000);
+  if(dias < 0){ el.classList.add("vencido"); el.textContent = "Corte cerrado, el día " + fecha; }
+  else if(dias === 0){ el.classList.add("vencido"); el.textContent = "El corte cierra hoy, " + fecha; }
+  else el.textContent = "El corte cierra el " + fecha + ", faltan " + dias + (dias === 1 ? " día" : " días");
 }
 
 function pintarTabla(){
@@ -477,7 +655,7 @@ function pintarTabla(){
     return;
   }
   let h = '<thead><tr><th class="name">Aprendiz</th>';
-  evs.forEach(e => { h += '<th>' + esc(e.corto) + '<span>' + esc(e.comp) + (e.limite ? '<br>plazo: ' + esc(e.limite) : '') + '</span></th>'; });
+  evs.forEach(e => { h += '<th>' + esc(e.corto) + '<span>' + esc(e.comp) + (e.limite ? '<br>plazo: ' + esc(textoPlazo(e.limite)) : '') + '</span></th>'; });
   h += '</tr></thead><tbody>';
   filas.forEach(d => {
     const rojo = d.evidencias.some(e => e.estado === 4);
@@ -571,21 +749,28 @@ function pintarHistorico(){
 
 function pintarRiesgo(){
   const evs = evsDelMes(), caja = document.getElementById("riesgo");
-  const conPend = filasDelMes().filter(d => pend(d) > 0).sort((a,b) => pend(b) - pend(a));
-  if(!conPend.length){
-    caja.innerHTML = '<h2>Estudiantes en riesgo</h2><p class="vacio">Nadie está en riesgo. Toda la fase está calificada.</p>';
+  if(!hayEvidencias()){
+    caja.innerHTML = '<h2>Estudiantes en riesgo</h2><p class="vacio">Este mes todavía no tiene evidencias cargadas, así que no hay nada atrasado.</p>';
     return;
   }
-  let h = '<h2>Estudiantes en riesgo</h2><p class="cuenta">' + conPend.length +
-    (conPend.length === 1 ? ' aprendiz' : ' aprendices') + ' con evidencias sin calificar</p><ul class="plist">';
-  conPend.forEach(d => {
-    const faltan = d.evidencias.map((e,i) => ({e:e, i:i})).filter(x => x.e.estado !== 3);
+  const enRiesgo = filasDelMes().filter(d => vencidasSinReporte(d) > 0)
+    .sort((a,b) => vencidasSinReporte(b) - vencidasSinReporte(a));
+  if(!enRiesgo.length){
+    caja.innerHTML = '<h2>Estudiantes en riesgo</h2><p class="vacio">Nadie está en riesgo: ningún plazo se ha vencido sin reporte de entrega.</p>';
+    return;
+  }
+  let h = '<h2>Estudiantes en riesgo</h2><p class="cuenta">' + enRiesgo.length +
+    (enRiesgo.length === 1 ? ' aprendiz' : ' aprendices') + ' con plazo vencido y sin reporte de entrega</p><ul class="plist">';
+  enRiesgo.forEach(d => {
+    const faltan = d.evidencias.map((e,i) => ({e:e, i:i}))
+      .filter(x => SIN_REPORTE.indexOf(x.e.estado) !== -1 && plazoVencido(x.i));
     h += '<li><details><summary><span class="pcab"><b>' + esc(d.nombre) + '</b><span class="pnum">' +
-      faltan.length + (faltan.length === 1 ? ' pendiente' : ' pendientes') +
+      faltan.length + (faltan.length === 1 ? ' plazo vencido' : ' plazos vencidos') +
       '</span></span><span class="pcaret">▾</span></summary><ul>';
     faltan.forEach(x => {
       h += '<li class="pev"><i class="pdot s' + x.e.estado + '"></i><span>' + esc(evs[x.i].corto) +
-        '<em>' + esc(EST[x.e.estado]) + (x.e.compromiso ? ' · entrega ' + esc(x.e.compromiso) : '') + '</em></span></li>';
+        '<em>' + esc(EST[x.e.estado]) + (evs[x.i].limite ? ' · plazo: ' + esc(textoPlazo(evs[x.i].limite)) : '') +
+        '</em></span></li>';
     });
     h += '</ul></details></li>';
   });
@@ -594,6 +779,10 @@ function pintarRiesgo(){
 
 function pintarAlDia(){
   const evs = evsDelMes(), caja = document.getElementById("aldia");
+  if(!hayEvidencias()){
+    caja.innerHTML = '<h2>Estudiantes al día</h2><p class="vacio">Este mes todavía no tiene evidencias cargadas.</p>';
+    return;
+  }
   const ok = filasDelMes().filter(d => pend(d) === 0);
   if(!ok.length){
     caja.innerHTML = '<h2>Estudiantes al día</h2><p class="vacio">Todavía nadie tiene las evidencias del mes calificadas.</p>';
@@ -703,12 +892,12 @@ function pintarTurno(){
 }
 
 const COLOR_LIDER = {
-  ap6:{f:"#12508f", s:"#dbe7f6"},
-  ap9:{f:"#c2600f", s:"#fbe6cd"},
-  ap5:{f:"#2f7d47", s:"#d9edd9"},
-  ap3:{f:"#6b4a9c", s:"#e6dff5"},
-  ap1:{f:"#9a7b12", s:"#f6ecc6"},
-  ap7:{f:"#a83a58", s:"#f7dde3"}
+  ap6:{f:"#1c2340", s:"#dfe1e9"},
+  ap9:{f:"#c25939", s:"#f6ded5"},
+  ap5:{f:"#3d5c4a", s:"#dde7e0"},
+  ap3:{f:"#8a5a06", s:"#f6e3c2"},
+  ap1:{f:"#3b4054", s:"#e3e4e9"},
+  ap7:{f:"#0d0d0d", s:"#e2e2e2"}
 };
 const DIAS_ES = ["lun","mar","mié","jue","vie","sáb","dom"];
 
@@ -768,55 +957,99 @@ function fechaLarga(iso){
   return new Date(p[0], p[1]-1, p[2]).toLocaleDateString("es-CO", {day:"numeric", month:"long", year:"numeric"});
 }
 
+let destTimer = null, destPausa = 0;
+
 function pintarDestacados(){
   const caja = document.getElementById("destacados");
   const m = mesActual();
   if(!m){ caja.innerHTML = '<h2>Destacados</h2><p class="vacio">Sin datos todavía.</p>'; return; }
   const evs = evsDelMes(), filas = filasDelMes();
-  const ok = filas.filter(d => pend(d) === 0);
-  const deben = filas.filter(d => pend(d) > 0).sort((a,b) => pend(b) - pend(a));
+  const vacio = !evs.length;
+  const ok = vacio ? [] : filas.filter(d => pend(d) === 0);
+  const deben = vacio ? [] : filas.filter(d => vencidasSinReporte(d) > 0)
+    .sort((a,b) => vencidasSinReporte(b) - vencidasSinReporte(a));
   const d = diasHasta(m.corte);
 
-  let h = '<h2>Destacados</h2><p class="cuenta">Lo importante de ' + esc(m.nombre.toLowerCase()) + ', de un vistazo.</p><div class="dest">';
+  const slides = [];
 
-  h += '<div class="dest-card cor"><h3>Fecha de corte</h3><span class="gran">' +
-    (m.corte ? esc(fechaLarga(m.corte)) : "Sin definir") + '</span><ul><li><em>' +
-    (d === null ? "Agrega la fecha en la sección de abajo"
+  slides.push({tono:"t-corte", titulo:"Fecha de corte",
+    gran: m.corte ? fechaLarga(m.corte) : "Sin definir",
+    items: ['<em>' + (d === null ? "agrega la fecha en la sección de abajo"
       : d > 0 ? "faltan " + d + (d === 1 ? " día" : " días")
-      : d === 0 ? "es hoy" : "el corte ya pasó") + '</em></li></ul></div>';
+      : d === 0 ? "es hoy" : "el corte ya pasó") + '</em>']});
 
-  h += '<div class="dest-card ok"><h3>Al día</h3><span class="gran">' + ok.length + ' de ' + filas.length +
-    '</span><ul>' + (ok.length ? ok.map(x => '<li>' + esc(x.nombre) + '</li>').join("")
-      : '<li><em>nadie tiene todo calificado</em></li>') + '</ul></div>';
+  slides.push({tono:"t-ok", titulo:"Al día",
+    gran: vacio ? "—" : ok.length + " de " + filas.length,
+    items: vacio ? ['<em>sin evidencias cargadas este mes</em>']
+      : ok.length ? ok.map(x => esc(x.nombre)) : ['<em>nadie tiene todo calificado</em>']});
 
-  h += '<div class="dest-card deb"><h3>Deben evidencias</h3><span class="gran">' + deben.length +
-    '</span><ul>' + (deben.length ? deben.map(x => '<li>' + esc(x.nombre) + ' <em>' + pend(x) +
-      (pend(x) === 1 ? " pendiente" : " pendientes") + '</em></li>').join("")
-      : '<li><em>nadie debe evidencias</em></li>') + '</ul></div>';
+  slides.push({tono:"t-deb", titulo:"Plazo vencido sin reportar",
+    gran: vacio ? "—" : String(deben.length),
+    items: vacio ? ['<em>sin evidencias cargadas este mes</em>']
+      : deben.length ? deben.map(x => esc(x.nombre) + ' <em>' + vencidasSinReporte(x) +
+          (vencidasSinReporte(x) === 1 ? " vencida" : " vencidas") + '</em>')
+      : ['<em>ningún plazo vencido</em>']});
 
   const otros = meses.filter(x => x.id !== m.id && Array.isArray(x.evidencias) && x.evidencias.length)
     .sort((a,b) => (a.orden||0) - (b.orden||0));
-  let card = '<div class="dest-card otro"><h3>Actividad de otros meses</h3>';
-  if(!otros.length){
-    card += '<ul><li><em>no hay evidencias cargadas en otros meses</em></li></ul>';
-  }else{
-    card += '<ul>';
-    otros.forEach(x => {
-      const dd = diasHasta(x.corte);
-      card += '<li><b>' + esc(x.nombre) + '</b> <em>' + x.evidencias.length +
-        (x.evidencias.length === 1 ? " evidencia" : " evidencias") +
-        (x.corte ? " · corte " + esc(fechaLarga(x.corte)) +
-          (dd !== null && dd > 0 ? " (en " + dd + " días)" : dd === 0 ? " (hoy)" : " (cerrado)") : "") + '</em>';
-      x.evidencias.forEach(e => {
-        card += '<div style="font-size:.78rem;margin-top:3px">' + esc(e.corto) +
-          (e.limite ? ' <em>plazo: ' + esc(e.limite) + '</em>' : '') + '</div>';
-      });
-      card += '</li>';
-    });
-    card += '</ul>';
-  }
-  caja.innerHTML = h + card + '</div></div>';
+  slides.push({tono:"t-otro", titulo:"Actividad de otros meses",
+    gran: otros.length ? otros.length + (otros.length === 1 ? " mes" : " meses") : "—",
+    items: otros.length ? otros.map(x => {
+        const dd = diasHasta(x.corte);
+        return '<b>' + esc(x.nombre) + '</b> <em>' + x.evidencias.length +
+          (x.evidencias.length === 1 ? " evidencia" : " evidencias") +
+          (x.corte ? " · corte " + esc(fechaLarga(x.corte)) +
+            (dd !== null && dd > 0 ? " (en " + dd + " días)" : dd === 0 ? " (hoy)" : " (cerrado)") : "") + '</em>' +
+          x.evidencias.map(e => '<div class="sub-ev">' + esc(e.corto) +
+            (e.limite ? ' <em>plazo: ' + esc(textoPlazo(e.limite)) + '</em>' : '') + '</div>').join("");
+      })
+    : ['<em>no hay evidencias cargadas en otros meses</em>']});
+
+  caja.innerHTML = '<h2>Destacados</h2>' +
+    '<div class="slider" id="dest-slider">' +
+      slides.map(sl => '<article class="slide ' + sl.tono + '">' +
+        '<span class="slide-mes">Lo importante de ' + esc(m.nombre.toLowerCase()) + '</span>' +
+        '<h3>' + esc(sl.titulo) + '</h3>' +
+        '<span class="gran">' + sl.gran + '</span><ul>' +
+        sl.items.map(it => '<li>' + it + '</li>').join("") + '</ul></article>').join("") +
+    '</div>' +
+    '<div class="puntos" id="dest-puntos">' + slides.map((sl,i) =>
+      '<button type="button" class="punto ' + sl.tono + (i === 0 ? ' on' : '') + '" data-i="' + i +
+      '" aria-label="Ver ' + esc(sl.titulo) + '"></button>').join("") + '</div>';
+
+  armarSlider();
 }
+
+function armarSlider(){
+  const pista = document.getElementById("dest-slider");
+  const puntos = document.getElementById("dest-puntos");
+  if(!pista) return;
+  if(destTimer){ clearInterval(destTimer); destTimer = null; }
+
+  const marcar = () => {
+    const i = Math.round(pista.scrollLeft / pista.clientWidth);
+    puntos.querySelectorAll(".punto").forEach((b,k) => b.classList.toggle("on", k === i));
+  };
+  const irA = i => pista.scrollTo({left: i * pista.clientWidth, behavior: "smooth"});
+
+  pista.addEventListener("scroll", () => { clearTimeout(pista._t); pista._t = setTimeout(marcar, 80); });
+  pista.addEventListener("pointerdown", () => { destPausa = Date.now(); });
+  pista.addEventListener("mouseenter", () => { destPausa = Date.now(); });
+  puntos.querySelectorAll(".punto").forEach(b => b.addEventListener("click", () => {
+    destPausa = Date.now(); irA(+b.dataset.i);
+  }));
+
+  destTimer = setInterval(() => {
+    if(!document.body.contains(pista)){ clearInterval(destTimer); destTimer = null; return; }
+    if(Date.now() - destPausa < 10000) return;
+    const total = pista.querySelectorAll(".slide").length;
+    const i = Math.round(pista.scrollLeft / pista.clientWidth);
+    irA((i + 1) % total);
+  }, 5000);
+}
+
+let editando = null;        // índice de la evidencia que se está editando
+let modoNuevoMes = false;   // true cuando el formulario está creando un mes
 
 function mesSiguienteId(){
   let base = null;
@@ -836,11 +1069,8 @@ function dosDig(n){ return n < 10 ? "0" + n : "" + n; }
 function limitesDelMes(mesId){
   const p = mesId.split("-").map(Number);
   const ultimo = new Date(p[0], p[1], 0).getDate();
-  return {
-    min: mesId + "-01",
-    max: mesId + "-" + dosDig(ultimo),
-    sugerido: mesId + "-" + dosDig(Math.min(29, ultimo))
-  };
+  return {min: mesId + "-01", max: mesId + "-" + dosDig(ultimo),
+          sugerido: mesId + "-" + dosDig(Math.min(29, ultimo))};
 }
 function aplicarLimites(inputId, mesId, ponerValor){
   const el = document.getElementById(inputId);
@@ -849,8 +1079,6 @@ function aplicarLimites(inputId, mesId, ponerValor){
   el.min = l.min; el.max = l.max;
   if(ponerValor || !el.value) el.value = l.sugerido;
 }
-
-let editando = null;   // índice de la evidencia que se está editando
 
 function pintarNuevo(){
   const caja = document.getElementById("nuevo");
@@ -861,113 +1089,101 @@ function pintarNuevo(){
   const m = mesActual();
   const evs = evsDelMes();
   const sig = mesSiguienteId();
-  const p = sig.split("-").map(Number);
-  const nombreSig = MESES_ES[p[1]-1].charAt(0).toUpperCase() + MESES_ES[p[1]-1].slice(1) + " " + p[0];
+  const ps = sig.split("-").map(Number);
+  const nombreSig = MESES_ES[ps[1]-1].charAt(0).toUpperCase() + MESES_ES[ps[1]-1].slice(1) + " " + ps[0];
 
   let h = '<h2>Evidencias y meses</h2>' +
-    '<p class="cuenta">Crea y edita las evidencias de cada mes, sus plazos y la fecha de corte.</p>';
+    '<p class="cuenta">Elige un mes para editarlo y agregarle evidencias, o crea el siguiente.</p>';
 
-  h += '<h3 class="tit sub2">Evidencias por mes</h3>';
-  h += '<div class="form"><div><label for="a-mes">Mes</label><select id="a-mes" class="sel">' +
-    meses.map(x => '<option value="' + x.id + '"' + (m && x.id === m.id ? ' selected' : '') + '>' +
-      esc(x.nombre) + '</option>').join("") + '</select></div></div>';
+  h += '<div class="form"><select id="a-mes" class="sel">' +
+    meses.map(x => '<option value="' + x.id + '"' + (!modoNuevoMes && m && x.id === m.id ? ' selected' : '') + '>' +
+      esc(x.nombre) + '</option>').join("") +
+    '<option value="__nuevo"' + (modoNuevoMes ? ' selected' : '') + '>+ Crear ' + esc(nombreSig) + '</option></select></div>';
 
-  if(m){
-    h += '<div class="form bloque"><span class="etq">Editar mes</span>' +
-      '<div class="fila">' +
-        '<div><label for="e-nom">Nombre del mes</label><input type="text" id="e-nom" value="' + esc(m.nombre) + '"></div>' +
-        '<div><label for="a-corte">Fecha de corte</label><input type="date" id="a-corte" value="' + esc(m.corte || "") + '"></div>' +
-      '</div>' +
-      '<button type="button" id="e-mes-btn">Guardar cambios del mes</button>' +
-      '<button type="button" class="sec" id="a-corte-btn">Guardar solo la fecha de corte</button>' +
-      '<p class="msg" id="e-msg"></p></div>';
-  }
-
-  h += '<ul class="evlist">';
-  if(!evs.length){
-    h += '<li><em>este mes todavía no tiene evidencias</em></li>';
-  }else{
-    evs.forEach((e,i) => {
-      if(editando === i){
-        h += '<li class="edit"><div class="fila tres">' +
-          '<input type="text" class="ed-nom" value="' + esc(e.corto) + '" placeholder="Nombre">' +
-          '<input type="text" class="ed-comp" value="' + esc(e.comp || "") + '" placeholder="Componente y código">' +
-          '<input type="text" class="ed-lim" value="' + esc(e.limite || "") + '" placeholder="Plazo de entrega">' +
-          '</div><div class="acciones">' +
-          '<button type="button" class="mini" data-guardar="' + i + '">Guardar evidencia</button>' +
-          '<button type="button" class="mini sec" data-cancelar="1">Cancelar</button>' +
-          '<button type="button" class="mini del" data-borrar="' + i + '">Eliminar</button>' +
-          '</div></li>';
-      }else{
-        h += '<li><div class="ev-txt"><b>' + esc(e.corto) + '</b><em>' + esc(e.comp || "") +
-          (e.limite ? ' · plazo: ' + esc(e.limite) : '') + '</em></div>' +
-          '<button type="button" class="mini sec" data-editar="' + i + '">Editar evidencia</button></li>';
-      }
-    });
-  }
-  h += '</ul>';
-
-  h += '<div class="form bloque"><span class="etq">Crear evidencia</span>' +
-    '<div class="fila tres">' +
-      '<input type="text" id="a-nom" placeholder="Nombre de la evidencia">' +
-      '<input type="text" id="a-comp" placeholder="Componente y código">' +
-      '<input type="text" id="a-lim" placeholder="Plazo de entrega">' +
-    '</div>' +
-    '<button type="button" id="a-add">Crear evidencia</button>' +
-    '<p class="msg" id="a-msg"></p></div>';
-
-  h += '<h3 class="tit sub2">Crear el mes siguiente</h3>' +
-    '<div class="form bloque">' +
-      '<p class="msg">Viene programado con ' + esc(nombreSig) + ', el mes que sigue al último creado.</p>' +
+  if(modoNuevoMes){
+    h += '<div class="form bloque">' +
       '<div class="fila">' +
         '<div><label for="n-mes">Mes</label><input id="n-mes" type="month" value="' + sig + '"></div>' +
         '<div><label for="n-corte">Fecha del corte</label><input id="n-corte" type="date"></div>' +
       '</div>' +
-      '<div><label>Evidencias: nombre, componente y plazo de entrega</label><div class="evs" id="n-evs"></div></div>' +
-      '<button type="button" class="sec" id="n-add">Agregar otra línea de evidencia</button>' +
-      '<button type="button" id="n-crear">Crear mes siguiente</button>' +
-      '<p class="msg" id="n-msg"></p>' +
-    '</div>';
+      '<p class="msg">El mes se crea vacío. Sus evidencias se agregan aquí mismo, eligiéndolo luego en la lista de arriba.</p>' +
+      '<button type="button" id="n-crear">Crear mes</button>' +
+      '<p class="msg" id="n-msg"></p></div>';
+    caja.innerHTML = h;
+    document.getElementById("a-mes").addEventListener("change", cambiarMesForm);
+    aplicarLimites("n-corte", sig, true);
+    document.getElementById("n-mes").addEventListener("change", e => {
+      if(e.target.value) aplicarLimites("n-corte", e.target.value, true);
+    });
+    document.getElementById("n-crear").addEventListener("click", crearMes);
+    return;
+  }
+
+  if(m){
+    h += '<div class="form bloque">' +
+      '<div class="fila">' +
+        '<div><label for="e-nom">Nombre del mes</label><input type="text" id="e-nom" value="' + esc(m.nombre) + '"></div>' +
+        '<div><label for="a-corte">Fecha de corte</label><input type="date" id="a-corte" value="' + esc(m.corte || "") + '"></div>' +
+      '</div>' +
+      '<button type="button" class="sec" id="e-mes-btn">Guardar nombre y fecha de corte</button>' +
+      '<p class="msg" id="e-msg"></p></div>';
+
+    if(evs.length){
+      h += '<ul class="evlist">';
+      evs.forEach((e,i) => {
+        if(editando === i){
+          h += '<li class="edit"><div class="fila tres">' +
+            '<input type="text" class="ed-nom" value="' + esc(e.corto) + '" placeholder="Nombre">' +
+            '<input type="text" class="ed-comp" value="' + esc(e.comp || "") + '" placeholder="Componente y código">' +
+            '<div class="campo"><label>Plazo</label><input type="date" class="ed-lim" value="' +
+              esc(esISO(e.limite) ? e.limite : "") + '"></div>' +
+            '</div><div class="acciones">' +
+            '<button type="button" class="mini" data-guardar="' + i + '">Guardar</button>' +
+            '<button type="button" class="mini sec" data-cancelar="1">Cancelar</button>' +
+            '<button type="button" class="mini del" data-borrar="' + i + '">Eliminar</button>' +
+            '</div></li>';
+        }else{
+          h += '<li><div class="ev-txt"><b>' + esc(e.corto) + '</b><em>' + esc(e.comp || "") +
+            (e.limite ? ' · plazo: ' + esc(textoPlazo(e.limite)) : '') + '</em></div>' +
+            '<button type="button" class="mini sec" data-editar="' + i + '">Editar</button></li>';
+        }
+      });
+      h += '</ul>';
+    }
+
+    h += '<div class="form bloque"><span class="etq">Nueva evidencia para ' + esc(m.nombre) + '</span>' +
+      '<div class="fila tres">' +
+        '<input type="text" id="a-nom" placeholder="Construir el video del animatic">' +
+        '<input type="text" id="a-comp" placeholder="Técnico · GA4-250201021-AA2-EV01">' +
+        '<div class="campo"><label for="a-lim">Plazo de entrega</label><input type="date" id="a-lim"></div>' +
+      '</div>' +
+      '<button type="button" id="a-add">Crear evidencia</button>' +
+      '<p class="msg" id="a-msg"></p></div>';
+  }
   caja.innerHTML = h;
 
-  aplicarLimites("n-corte", sig, true);
-  document.getElementById("n-mes").addEventListener("change", e => {
-    if(e.target.value) aplicarLimites("n-corte", e.target.value, true);
-  });
-
-  const selMes = document.getElementById("a-mes");
-  if(selMes){
-    selMes.addEventListener("change", () => {
-      mesActivo = selMes.value; abierto = null; editando = null; pintarTodo();
-    });
-    document.getElementById("a-add").addEventListener("click", agregarEvidencia);
-  }
+  document.getElementById("a-mes").addEventListener("change", cambiarMesForm);
   if(m){
     aplicarLimites("a-corte", m.id, !m.corte);
-    document.getElementById("a-corte-btn").addEventListener("click", guardarCorte);
+    aplicarLimites("a-lim", m.id, false);
     document.getElementById("e-mes-btn").addEventListener("click", guardarMes);
+    document.getElementById("a-add").addEventListener("click", agregarEvidencia);
+    caja.querySelectorAll("[data-editar]").forEach(b => b.addEventListener("click", () => {
+      editando = +b.dataset.editar; pintarNuevo();
+    }));
+    caja.querySelectorAll("[data-cancelar]").forEach(b => b.addEventListener("click", () => {
+      editando = null; pintarNuevo();
+    }));
+    caja.querySelectorAll("[data-guardar]").forEach(b => b.addEventListener("click", () => guardarEvidencia(+b.dataset.guardar)));
+    caja.querySelectorAll("[data-borrar]").forEach(b => b.addEventListener("click", () => borrarEvidencia(+b.dataset.borrar)));
   }
-  caja.querySelectorAll("[data-editar]").forEach(b => b.addEventListener("click", () => {
-    editando = +b.dataset.editar; pintarNuevo();
-  }));
-  caja.querySelectorAll("[data-cancelar]").forEach(b => b.addEventListener("click", () => {
-    editando = null; pintarNuevo();
-  }));
-  caja.querySelectorAll("[data-guardar]").forEach(b => b.addEventListener("click", () => guardarEvidencia(+b.dataset.guardar)));
-  caja.querySelectorAll("[data-borrar]").forEach(b => b.addEventListener("click", () => borrarEvidencia(+b.dataset.borrar)));
+}
 
-  const cont = document.getElementById("n-evs");
-  const fila = () => {
-    const d = document.createElement("div");
-    d.className = "fila tres";
-    d.innerHTML = '<input type="text" class="n-nom" placeholder="Nombre de la evidencia">' +
-      '<input type="text" class="n-comp" placeholder="Componente y código">' +
-      '<input type="text" class="n-lim" placeholder="Plazo de entrega">';
-    cont.appendChild(d);
-  };
-  for(let i = 0; i < 2; i++) fila();
-  document.getElementById("n-add").addEventListener("click", fila);
-  document.getElementById("n-crear").addEventListener("click", crearMes);
+function cambiarMesForm(ev){
+  const v = ev.target.value;
+  editando = null;
+  if(v === "__nuevo"){ modoNuevoMes = true; pintarNuevo(); return; }
+  modoNuevoMes = false; mesActivo = v; abierto = null; pintarTodo();
 }
 
 async function guardarEvidencia(i){
@@ -1046,24 +1262,18 @@ async function crearMes(){
   const corte = document.getElementById("n-corte").value;
   if(!mesVal){ msg.textContent = "Elige el mes."; return; }
   if(meses.some(x => x.id === mesVal)){ msg.textContent = "Ese mes ya existe. Agrégale evidencias arriba."; return; }
-  const evs = [];
-  document.querySelectorAll("#n-evs .fila").forEach(f => {
-    const nom = f.querySelector(".n-nom").value.trim();
-    const comp = f.querySelector(".n-comp").value.trim();
-    const lim = f.querySelector(".n-lim").value.trim();
-    if(nom) evs.push({corto: nom, comp: comp || "Por definir", largo: nom, limite: lim});
-  });
   const p = mesVal.split("-").map(Number);
   const nombre = MESES_ES[p[1]-1].charAt(0).toUpperCase() + MESES_ES[p[1]-1].slice(1) + " " + p[0];
-  const doc = {orden: p[0]*100 + p[1], nombre: nombre, corte: corte || "", evidencias: evs};
+  const doc = {orden: p[0]*100 + p[1], nombre: nombre, corte: corte || "", evidencias: []};
   msg.textContent = "Creando el mes…";
   meses.push(Object.assign({id: mesVal}, doc));
   meses.sort((a,b) => (a.orden||0) - (b.orden||0));
   mesActivo = mesVal;
+  modoNuevoMes = false;
   await guardar("meses", mesVal, doc);
   pintarTodo();
   const m2 = document.getElementById("n-msg");
-  if(m2) m2.textContent = "Mes creado. Ya puedes marcar las evidencias.";
+  if(m2) m2.textContent = "Mes creado.";
 }
 
 function pintarTodo(){
@@ -1083,7 +1293,7 @@ function pintarSheet(){
   if(!d) return;
   const e = d.evidencias[sel.ev];
   document.getElementById("sh-ev").textContent = evs[sel.ev].largo;
-  document.getElementById("sh-who").textContent = d.nombre + " · " + evs[sel.ev].comp + (evs[sel.ev].limite ? " · plazo: " + evs[sel.ev].limite : "");
+  document.getElementById("sh-who").textContent = d.nombre + " · " + evs[sel.ev].comp + (evs[sel.ev].limite ? " · plazo: " + textoPlazo(evs[sel.ev].limite) : "");
   document.getElementById("sh-opts").innerHTML = EST.map((t,k) =>
     '<button class="opt o' + k + '" type="button" data-est="' + k + '" aria-pressed="' + (e.estado === k) + '">' + t + '</button>').join("");
   document.getElementById("sh-opts").querySelectorAll(".opt").forEach(btn => btn.addEventListener("click", () => {
