@@ -1,11 +1,11 @@
 /* ============================================================
    Tablero de evidencias · The Phantom Frame Studios
-   Hoja de estilos · versión 2.0
-   Paleta base: #0D0D0D negro · #1C2340 navy · #3B4054 gris azul
-   #3D5C4A verde · #C25939 terracota · #E8A74B ocre
-   #ECD9AF arena · #F2E8CF crema · #FCA311 oro · #FFFFFF blanco
-   Estados de entrega en escala de semáforo, con modo oscuro y
-   estilos de impresión al final.
+   Hoja de estilos · versión 2.1
+   Paleta: #0D0D0D negro · #1C2340 navy · #3B4054 gris azul ·
+   #3D5C4A verde · #C25939 terracota · #E8A74B ocre ·
+   #ECD9AF arena · #F2E8CF crema · #FFFFFF blanco.
+   Estados de entrega en escala de semáforo. Incluye modo oscuro
+   y estilos de impresión al final.
    ============================================================ */
 
 /* Paleta base: #0D0D0D negro · #1C2340 navy · #3B4054 gris azul · #3D5C4A verde ·
@@ -119,33 +119,9 @@ html{scroll-behavior:smooth}
   transition:color .25s ease, font-size .25s ease;display:inline-block}
 .corte-linea:hover{color:var(--lemon);font-size:.84rem}
 .corte-linea.vencido:hover{color:var(--rose)}
-.corte{display:flex;gap:13px;align-items:flex-start;border:1px solid rgba(255,255,255,.14);
-  border-radius:13px;padding:13px 15px;margin:14px 0;color:#fff;background:var(--night);
-  transition:background .4s ease}
-.corte .big{font-family:Inter;font-weight:800;font-size:2rem;line-height:1;color:#fff}
-.corte.chico{padding:6px 0;gap:10px;align-items:baseline;margin:12px 0 0;border-radius:0;
-  max-width:700px;background:none !important;border:0 !important}
 /* sin fondo: el estado del corte se expresa en el color del texto */
-.corte.chico.n6 .big,.corte.chico.n5 .big{color:#fff}
-.corte.chico.n4 .big,.corte.chico.n3 .big{color:#e6ea52}
-.corte.chico.n2 .big{color:var(--lemon)}
-.corte.chico.n1 .big,.corte.chico.n0 .big{color:var(--rose)}
-.corte.chico.fin .big{color:#b9bcb3}
-.corte.chico .big,.corte.chico .kicker,.corte.chico p{transition:font-size .25s ease}
-.corte.chico .big{font-size:.92rem}
-.corte.chico .kicker{font-size:.66rem}
-.corte.chico p{font-size:.78rem;opacity:.85;line-height:1.3;white-space:nowrap}
 
-.corte.chico:hover .big{font-size:1.15rem}
-.corte.chico:hover .kicker{font-size:.72rem}
-.corte.chico:hover p{font-size:.88rem;opacity:1}
 @media (max-width:560px){.corte.chico{gap:8px}.corte.chico p{white-space:normal}}
-.corte .kicker{color:#fff;opacity:.9}
-.corte p{margin:0;font-size:.86rem;color:#fff;opacity:.92}
-.corte.n6{background:#0c0f0a} .corte.n5{background:#2b3324} .corte.n4{background:#56590a}
-.corte.n3{background:#8a8d00}
-.corte.n2 .big,.corte.n2 p,.corte.n2 .kicker{color:#0c0f0a} .corte.n2{background:#fbff12;color:#0c0f0a} .corte.n1{background:#ff206e}
-.corte.n0{background:#a8114b} .corte.fin{background:#5d6157}
 
 h2.tit{font-size:1.02rem;font-weight:800;margin:0 0 4px}
 p.desc{font-size:.84rem;color:var(--ink-2);margin:0 0 12px;font-style:italic}
@@ -354,18 +330,10 @@ tfoot td.name{text-align:left;font-size:.78rem;font-weight:600;font-style:normal
 .punto.t-deb{background:var(--terracota)}
 .punto.t-otro{background:var(--navy)}
 .punto:focus-visible{outline:2px solid var(--night);outline-offset:2px}
-.dest-card{border:1px solid var(--line);border-radius:11px;padding:11px 12px;background:var(--bg)}
-.dest-card h3{font-size:.8rem;font-weight:700;margin:0 0 6px;color:var(--ink-2)}
-.dest-card .gran{font-family:Inter,sans-serif;font-weight:800;font-size:1.3rem;line-height:1.1;display:block}
-.dest-card ul{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:4px}
-.dest-card li{font-size:.82rem;line-height:1.3}
-.dest-card li em{font-style:italic;color:var(--ink-2);font-size:.76rem}
 
 
 
 
-.mini-mes{font-size:.72rem;font-weight:700;color:var(--blue);background:var(--blue-soft);
-  border-radius:99px;padding:2px 8px;margin-left:5px}
 .evlist{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:0}
 .evlist li{font-size:.88rem;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:11px 1px;background:none}
 .evlist li em{display:block;font-style:italic;font-size:.76rem;color:var(--ink-2)}
@@ -414,12 +382,6 @@ tfoot td.name{text-align:left;font-size:.78rem;font-weight:600;font-style:normal
 .form button.sec:hover{color:var(--ink);border-bottom-color:var(--rose)}
 .form button:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
 .form .msg{font-size:.82rem;font-style:italic;color:var(--ink-2);margin:0}
-.ejemplo{border:1px dashed var(--line);border-radius:10px;padding:10px 12px;background:var(--panel);font-size:.83rem}
-.ejemplo b{display:block;font-family:Inter,sans-serif;font-size:.85rem}
-.ejemplo span{display:block;color:var(--ink-2);font-style:italic;font-size:.78rem;margin:3px 0 6px}
-.ejemplo ul{list-style:none;margin:0;padding:0;display:grid;gap:4px}
-.ejemplo li{font-size:.82rem}
-.ejemplo em{font-style:normal;font-weight:600;color:var(--blue)}
 .tit.sub2{font-size:.95rem;margin:16px 0 8px}
 .form.bloque{border:0;border-top:1px solid var(--line);border-radius:0;padding:15px 0 0;background:none;margin-top:15px}
 .form.bloque .etq{font:600 .72rem Inter,sans-serif;color:var(--ink-2);letter-spacing:.06em;display:block;margin-bottom:4px}

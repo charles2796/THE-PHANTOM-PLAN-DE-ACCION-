@@ -2,7 +2,14 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#0d0d0d">
+<meta name="description" content="Seguimiento de las evidencias del grupo The Phantom Frame Studios, Tecnólogo en Animación Digital: fases, meses, estado de entrega por aprendiz, plazos y turno de liderazgo.">
+<meta name="author" content="Jhann Charles Corredor Jaimes">
+<meta property="og:title" content="Tablero de evidencias · The Phantom Frame Studios">
+<meta property="og:description" content="Cronograma por fases y meses, estado de entrega por aprendiz y turno de liderazgo.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="logo.png">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Tablero de evidencias · The Phantom Frame Studios</title>
 <link rel="icon" href="logo.png">
@@ -106,6 +113,7 @@
 const EST = ["Sin novedad","En desarrollo","Se entrega","Calificada","No entregado","Entregado tarde"];
 const LLAVE = "phantom-evidencias-v3";
 const LLAVE_QUIEN = "phantom-quien";
+const CRONOGRAMA_V = 3;   // sube este número cada vez que cambie el cronograma
 let quien = "";
 try{ quien = localStorage.getItem(LLAVE_QUIEN) || ""; }catch(e){ quien = ""; }
 function guardarQuien(v){
@@ -1484,7 +1492,7 @@ function buscarDoc(col, id){
 }
 function guardarLocal(){
   try{
-    localStorage.setItem(LLAVE, JSON.stringify({registros:registros, semanas:semanas, meses:meses}));
+    localStorage.setItem(LLAVE, JSON.stringify({cronograma:CRONOGRAMA_V, registros:registros, semanas:semanas, meses:meses}));
   }catch(e){
     avisar("Este navegador no permite guardar los cambios. Revisa si estás en modo incógnito.");
   }
@@ -1493,7 +1501,9 @@ function guardarLocal(){
 function modoLocal(){
   let g = null;
   try{ g = JSON.parse(localStorage.getItem(LLAVE) || "null"); }catch(e){ g = null; }
-  meses = (g && Array.isArray(g.meses) && g.meses.length) ? g.meses : SEED_MESES.slice();
+  // el cronograma manda: si el archivo trae una versión nueva, se descarta el guardado viejo
+  const alDia = g && g.cronograma === CRONOGRAMA_V && Array.isArray(g.meses) && g.meses.length;
+  meses = alDia ? g.meses : SEED_MESES.slice();
   aprendices = SEED_APR.slice();
   registros = (g && Array.isArray(g.registros)) ? g.registros : SEED_APR.map(a => ({
     id: "2026-09__" + a.id, mes:"2026-09", ap:a.id, orden:a.orden,
@@ -1521,7 +1531,7 @@ function suscribir(store){
   sub("semanas", d => { semanas = d; });
 }
 
-const VERSION = "2.0 · 6 de octubre de 2026";
+const VERSION = "2.2 · 6 de octubre de 2026";
 try{
   const temaGuardado = localStorage.getItem("phantom-tema");
   if(temaGuardado) document.documentElement.setAttribute("data-tema", temaGuardado);
