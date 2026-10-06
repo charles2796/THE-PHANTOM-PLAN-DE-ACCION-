@@ -3,13 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="color-scheme" content="light">
-<meta name="theme-color" content="#0d0d0d">
-<meta name="description" content="Seguimiento mensual de las evidencias del grupo The Phantom Frame Studios: estado de entrega por aprendiz, plazos, estudiantes en riesgo y turno de liderazgo.">
-<meta name="author" content="Jhann Charles Corredor Jaimes">
-<meta property="og:title" content="Tablero de evidencias · The Phantom Frame Studios">
-<meta property="og:description" content="Estado de entrega por aprendiz, plazos, estudiantes en riesgo y turno de liderazgo.">
-<meta property="og:type" content="website">
-<meta property="og:image" content="logo.png">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Tablero de evidencias · The Phantom Frame Studios</title>
 <link rel="icon" href="logo.png">
@@ -63,16 +56,26 @@
 <div class="sec-head" id="tablero"><span class="eyebrow">Seguimiento</span>
   <h2 class="tit">Estado de entrega</h2>
   <p class="desc">Cada casilla toma el color del estado en que va la evidencia. Tócala para cambiarlo o anotar tu fecha de entrega.</p></div>
+<div class="herramientas">
+  <input type="search" id="buscar" placeholder="Buscar un aprendiz" aria-label="Buscar un aprendiz">
+  <button type="button" id="btn-vista" class="herr">Ver como tarjetas</button>
+  <button type="button" id="btn-csv" class="herr">Descargar Excel</button>
+  <button type="button" id="btn-pdf" class="herr">Imprimir o PDF</button>
+  <button type="button" id="btn-wa" class="herr">Mensaje para el grupo</button>
+  <button type="button" id="btn-tema" class="herr" aria-pressed="false">Modo oscuro</button>
+</div>
 <div class="legend" id="legend"></div>
 <div class="aviso" id="aviso" hidden></div>
 <div class="scroll"><table id="tabla"><tbody><tr><td class="name">Cargando…</td></tr></tbody></table></div>
 
+<section class="caja plazos" id="plazos"></section>
 <div id="notas"></div>
 <section class="caja riesgo" id="riesgo"></section>
 <section class="caja aldia" id="aldia"></section>
 <section class="caja turno" id="turno"></section>
 <section class="caja lideres" id="lideres"></section>
 <section class="caja historico" id="historico"></section>
+<section class="caja aprendices" id="aprendices"></section>
 <section class="caja nuevo" id="nuevo"></section>
 
 <footer>
@@ -94,23 +97,144 @@
       <label for="sh-fecha">Me comprometo a entregar</label>
       <input id="sh-fecha" type="text" placeholder="26 de septiembre, 12:00 p. m.">
     </div>
+    <div class="fecha" id="sh-firma"></div>
     <button class="cerrar" type="button" id="sh-cerrar">Listo</button>
   </div>
 </div>
 
 <script>
-const EST = ["Sin novedad","En desarrollo","Se entrega","Calificada","No entregado"];
+const EST = ["Sin novedad","En desarrollo","Se entrega","Calificada","No entregado","Entregado tarde"];
 const LLAVE = "phantom-evidencias-v3";
+const LLAVE_QUIEN = "phantom-quien";
+let quien = "";
+try{ quien = localStorage.getItem(LLAVE_QUIEN) || ""; }catch(e){ quien = ""; }
+function guardarQuien(v){
+  quien = v;
+  try{ localStorage.setItem(LLAVE_QUIEN, v); }catch(e){}
+}
+function selloHoy(){
+  return new Date().toLocaleDateString("es-CO", {day:"numeric", month:"short"}) + ", " +
+    new Date().toLocaleTimeString("es-CO", {hour:"2-digit", minute:"2-digit"});
+}
 
 const SEED_MESES = [
-  {id:"2026-08", orden:202608, nombre:"Agosto 2026", corte:"", evidencias:[]},
-  {id:"2026-09", orden:202609, nombre:"Septiembre 2026", corte:"2026-09-29", evidencias:[
-    {corto:"Bitácora del despiece", comp:"Técnico · GA4-250201021-AA1-EV01", largo:"Bitácora del despiece del storyboard"},
-    {corto:"Virtual job interview", comp:"Bilingüismo · GA4-240202501-AA1-EV02", largo:"Virtual job interview"},
-    {corto:"Video de cámara tracking", comp:"Técnico · GA4-220501084-AA1-EV03", largo:"Video de cámara tracking"},
-    {corto:"Conceptos de biología", comp:"Biología · GA4-220201501-AA1-EV01", largo:"Conceptos básicos de la biología que componen el entorno vivo"}
+  {id:"2026-04", orden:202604, nombre:"Abril 2026", corte:"2026-04-26", evidencias:[
+    {corto:"Mapa colaborativo", comp:"Técnico · AA1-EV01", largo:"Mapa colaborativo y reflexión escrita", apertura:"2026-04-17", limite:"2026-04-22"},
+    {corto:"Conociendo el Sena", comp:"SST · AA2-EV01", largo:"Mapa mental y logo: conociendo el Sena", apertura:"2026-04-22", limite:"2026-04-26"}
   ]},
-  {id:"2026-10", orden:202610, nombre:"Octubre 2026", corte:"2026-10-29", evidencias:[]}
+  {id:"2026-05", orden:202605, nombre:"Mayo 2026", corte:"2026-05-26", evidencias:[
+    {corto:"Mi rutina saludable", comp:"SST · GA1-230101507-AA1-EV01", largo:"Mi rutina saludable como animador digital", apertura:"2026-04-29", limite:"2026-05-05"},
+    {corto:"Software y servicios de internet", comp:"TIC · GA1-220501046-AA1-EV01", largo:"Mapa conceptual: software y servicios de internet", apertura:"2026-05-06", limite:"2026-05-12"},
+    {corto:"Cuestionario técnicas de animación", comp:"Técnico · GA1-250201022-AA1-EV01", largo:"Cuestionario técnicas de animación", apertura:"2026-05-13", limite:"2026-05-19"},
+    {corto:"Técnicas de animación", comp:"Técnico · GA1-250201022-AA1-EV02", largo:"Técnicas de animación", apertura:"2026-05-13", limite:"2026-05-19"},
+    {corto:"English presentation video", comp:"Bilingüismo · GA1-240202501-AA1-EV01", largo:"English presentation video", apertura:"2026-05-20", limite:"2026-05-26"}
+  ]},
+  {id:"2026-06", orden:202606, nombre:"Junio 2026", corte:"2026-06-30", evidencias:[
+    {corto:"Contexto productivo", comp:"Investigación · GA1-240201064-AA1-EV01", largo:"Mapa mental del contexto productivo", apertura:"2026-05-27", limite:"2026-06-02"},
+    {corto:"Guion literario", comp:"Técnico · GA2-250201022-AA2-EV03", largo:"Creación del guion literario", apertura:"2026-06-03", limite:"2026-06-09"},
+    {corto:"Mejora de productos con TIC", comp:"TIC · GA2-220501046-AA2-EV01", largo:"Informe de mejora de productos y procesos con TIC", apertura:"2026-06-10", limite:"2026-06-16"},
+    {corto:"Estructura narrativa", comp:"Técnico · GA2-220501085-AA1-EV01", largo:"Verifica la estructura narrativa", apertura:"2026-06-17", limite:"2026-06-23"},
+    {corto:"Cuestionario lenguaje audiovisual", comp:"Técnico · GA2-250201022-AA1-EV01", largo:"Cuestionario lenguaje audiovisual", apertura:"2026-06-24", limite:"2026-06-30"},
+    {corto:"Guion técnico", comp:"Técnico · GA2-250201022-AA1-EV02", largo:"Documento con el guion técnico", apertura:"2026-06-24", limite:"2026-06-30"}
+  ]},
+  {id:"2026-07", orden:202607, nombre:"Julio 2026", corte:"2026-07-28", evidencias:[
+    {corto:"Questionnaire", comp:"Bilingüismo · GA3-240202501-AA1-EV01", largo:"Questionnaire", apertura:"2026-07-01", limite:"2026-07-07"},
+    {corto:"Boceto del storyboard", comp:"Técnico · GA3-250201022-AA1-EV03", largo:"Diseñar el boceto del storyboard según el guion técnico", apertura:"2026-07-08", limite:"2026-07-14"},
+    {corto:"Propuesta de investigación", comp:"Investigación · GA3-240201064-AA2-EV01", largo:"Propuesta de investigación", apertura:"2026-07-15", limite:"2026-07-21"},
+    {corto:"Detectives del riesgo", comp:"SST · GA3-230101507-AA2-EV01", largo:"Detectives del riesgo: corrige al animador", apertura:"2026-07-22", limite:"2026-07-28"}
+  ]},
+  {id:"2026-08", orden:202608, nombre:"Agosto 2026", corte:"2026-08-25", evidencias:[
+    {corto:"Desarrollo del storyboard", comp:"Técnico · GA4-250201022-AA1-EV01", largo:"Desarrollo del storyboard a partir del boceto", apertura:"2026-08-05", limite:"2026-08-11"},
+    {corto:"Ajustes al storyboard", comp:"Técnico · GA4-250201022-AA1-EV02", largo:"Informe con ajustes de los parámetros al storyboard", apertura:"2026-08-12", limite:"2026-08-18"},
+    {corto:"Pausas activas y ergonomía", comp:"Cultura física · GA4-230101507-AA4-EV01", largo:"Storyboard de pausas activas y ergonomía", apertura:"2026-08-19", limite:"2026-08-25"}
+  ]},
+  {id:"2026-09", orden:202609, nombre:"Septiembre 2026", corte:"2026-09-29", evidencias:[
+    {corto:"Bitácora del despiece", comp:"Técnico · GA4-250201021-AA1-EV01", largo:"Bitácora del despiece del storyboard", apertura:"2026-08-26", limite:"2026-09-01"},
+    {corto:"Virtual job interview", comp:"Bilingüismo · GA4-240202501-AA1-EV02", largo:"Virtual job interview", apertura:"2026-09-02", limite:"2026-09-08"},
+    {corto:"Video de cámara tracking", comp:"Técnico · GA4-220501084-AA1-EV03", largo:"Video de cámara tracking", apertura:"2026-09-09", limite:"2026-09-15"},
+    {corto:"Conceptos del entorno vivo", comp:"Biología · GA4-220201501-AA1-EV01", largo:"Mapa mental con los conceptos básicos del entorno vivo", apertura:"2026-09-16", limite:"2026-09-22"}
+  ]},
+  {id:"2026-10", orden:202610, nombre:"Octubre 2026", corte:"2026-10-27", evidencias:[
+    {corto:"Video del animatic", comp:"Técnico · GA4-250201021-AA2-EV01", largo:"Construir el video del animatic del proyecto audiovisual", apertura:"2026-09-23", limite:"2026-10-06"},
+    {corto:"Propuesta de investigación", comp:"Investigación · GA4-240201064-AA2-EV01", largo:"Propuesta de investigación", apertura:"2026-10-07", limite:"2026-10-13"},
+    {corto:"Taller entorno vivo", comp:"Biología · GA4-220201501-AA2-EV01", largo:"Taller entorno vivo", apertura:"2026-10-14", limite:"2026-10-20"},
+    {corto:"Flujograma de animación", comp:"Técnico · GA4-220501084-AA1-EV01", largo:"Elaborar un flujograma y definir el estilo de animación", apertura:"2026-10-21", limite:"2026-10-27"}
+  ]},
+  {id:"2026-11", orden:202611, nombre:"Noviembre 2026", corte:"2026-11-17", evidencias:[
+    {corto:"Presentation and audio", comp:"Bilingüismo · GA4-240202501-AA2-EV02", largo:"Presentation and audio", apertura:"2026-10-28", limite:"2026-11-03"},
+    {corto:"Planificación de un plano", comp:"Técnico · GA4-220501084-AA1-EV02", largo:"Exponer la planificación de un plano de la producción", apertura:"2026-11-04", limite:"2026-11-10"},
+    {corto:"Cómo está tu condición física", comp:"Cultura física · GA4-230101507-AA3-EV01", largo:"Cómo está tu condición física", apertura:"2026-11-11", limite:"2026-11-17"}
+  ]},
+  {id:"2026-12", orden:202612, nombre:"Diciembre 2026", corte:"2026-12-01", evidencias:[
+    {corto:"Motion graphics de escenas", comp:"Técnico · GA4-220501084-AA1-EV06", largo:"Video del motion graphics de algunos elementos en las escenas", apertura:"2026-11-18", limite:"2026-12-01"}
+  ]},
+  {id:"2027-02", orden:202702, nombre:"Febrero 2027", corte:"2027-02-24", evidencias:[
+    {corto:"Pitch en 3 formatos", comp:"Comunicación · GA5-240201526-AA2-EV01", largo:"Pitch en 3 formatos: el poder de la comunicación", apertura:"2027-02-04", limite:"2027-02-10"},
+    {corto:"Ajuste del animatic", comp:"Técnico · GA5-250201021-AA2-EV03", largo:"Ajuste del video del animatic según evaluación", apertura:"2027-02-11", limite:"2027-02-17"},
+    {corto:"Exponer el animatic", comp:"Técnico · GA5-250201021-AA2-EV02", largo:"Exponer el animatic", apertura:"2027-02-18", limite:"2027-02-24"}
+  ]},
+  {id:"2027-03", orden:202703, nombre:"Marzo 2027", corte:"2027-03-30", evidencias:[
+    {corto:"Mind map", comp:"Bilingüismo · GA5-240202501-AA1-EV01", largo:"Mind map", apertura:"2027-02-25", limite:"2027-03-03"},
+    {corto:"Bocetos de personajes", comp:"Técnico · GA5-220501084-AA1-EV01", largo:"Documento con los bocetos del diseño de personaje, fondos y props", apertura:"2027-03-04", limite:"2027-03-10"},
+    {corto:"Test de Bechdel", comp:"Comunicación · GA5-240201526-AA1-EV01", largo:"Análisis cinematográfico usando el test de Bechdel", apertura:"2027-03-11", limite:"2027-03-17"},
+    {corto:"Propuesta de investigación", comp:"Investigación · GA6-240201064-AA2-EV01", largo:"Propuesta de investigación", apertura:"2027-03-24", limite:"2027-03-30"}
+  ]},
+  {id:"2027-04", orden:202704, nombre:"Abril 2027", corte:"2027-04-27", evidencias:[
+    {corto:"Ilustraciones de personajes", comp:"Técnico · GA6-220501084-AA1-EV02", largo:"Documento con las ilustraciones del diseño de personaje, fondos y props", apertura:"2027-03-18", limite:"2027-04-06"},
+    {corto:"Bitácora de creación", comp:"Técnico · GA6-220501084-AA1-EV04", largo:"Bitácora del proceso de creación del diseño de personaje y fondos", apertura:"2027-03-31", limite:"2027-04-06"},
+    {corto:"Narrativas visuales", comp:"Comunicación · GA6-240201526-AA3-EV01", largo:"Narrativas visuales con propósito: del guion a la pantalla", apertura:"2027-04-07", limite:"2027-04-13"},
+    {corto:"Color script", comp:"Técnico · GA6-220501084-AA1-EV05", largo:"Color script de las secuencias del proyecto", apertura:"2027-04-14", limite:"2027-04-20"},
+    {corto:"Expressing opinion forum", comp:"Bilingüismo · GA6-240202501-AA1-EV03", largo:"Expressing opinion forum", apertura:"2027-04-21", limite:"2027-04-27"}
+  ]},
+  {id:"2027-05", orden:202705, nombre:"Mayo 2027", corte:"2027-05-25", evidencias:[
+    {corto:"Despiece de personajes", comp:"Técnico · GA6-220501084-AA1-EV06", largo:"Archivo fuente del despiece de los personajes", apertura:"2027-04-28", limite:"2027-05-04"},
+    {corto:"Modelo Canvas", comp:"Emprendimiento · GA6-240201529-AA2-EV01", largo:"Modelo Canvas del emprendimiento", apertura:"2027-05-05", limite:"2027-05-11"},
+    {corto:"Rig de personajes", comp:"Técnico · GA7-220501084-AA1-EV01", largo:"Archivo fuente del rig de personajes, expresiones, fondos y props", apertura:"2027-05-12", limite:"2027-05-18"},
+    {corto:"Soluciones ambientales y SST", comp:"SST · GA7-220601501-AA1-EV01", largo:"Ilustración sobre soluciones en el contexto ambiental y de SST", apertura:"2027-05-19", limite:"2027-05-25"}
+  ]},
+  {id:"2027-06", orden:202706, nombre:"Junio 2027", corte:"2027-06-29", evidencias:[
+    {corto:"Ciclo de caminado", comp:"Técnico · GA7-220501084-AA1-EV05", largo:"Video del ciclo de caminado de los personajes", apertura:"2027-05-26", limite:"2027-06-01"},
+    {corto:"Ficha del personaje", comp:"Comunicación · GA7-240201524-AA2-EV01", largo:"Ficha de comunicación del personaje en formato digital", apertura:"2027-06-02", limite:"2027-06-08"},
+    {corto:"Expresiones y lipsync", comp:"Técnico · GA7-220501084-AA1-EV04", largo:"Video de las expresiones faciales y lipsync", apertura:"2027-06-09", limite:"2027-06-15"},
+    {corto:"Plan de marketing", comp:"Emprendimiento · GA7-210303025-AA3-EV01", largo:"Plan de marketing y financiación", apertura:"2027-06-16", limite:"2027-06-22"},
+    {corto:"Puesta en escena y acting", comp:"Técnico · GA7-220501084-AA1-EV07", largo:"Video de puestas en escena y acting", apertura:"2027-06-23", limite:"2027-06-29"}
+  ]},
+  {id:"2027-07", orden:202707, nombre:"Julio 2027", corte:"2027-07-27", evidencias:[
+    {corto:"Documentación del proyecto", comp:"Emprendimiento · GA7-210303025-AA3-EV02", largo:"Documentación del proyecto", apertura:"2027-06-30", limite:"2027-07-06"},
+    {corto:"Escenarios con fuerzas", comp:"Técnico · GA7-220501084-AA1-EV06", largo:"Video de los escenarios afectados por fuerzas", apertura:"2027-07-07", limite:"2027-07-13"},
+    {corto:"Hitos del conflicto armado", comp:"Comunicación · GA7-240201526-AA5-EV01", largo:"Mapa mental: hitos del conflicto armado en Colombia", apertura:"2027-07-14", limite:"2027-07-20"},
+    {corto:"Efectos de partículas", comp:"Técnico · GA8-220501084-AA1-EV01", largo:"Video de efectos de partículas", apertura:"2027-07-21", limite:"2027-07-27"}
+  ]},
+  {id:"2027-08", orden:202708, nombre:"Agosto 2027", corte:"2027-08-31", evidencias:[
+    {corto:"Efectos ambientales", comp:"Técnico · GA8-220501084-AA1-EV02", largo:"Video de efectos ambientales", apertura:"2027-07-28", limite:"2027-08-03"},
+    {corto:"Infografía ambiente y SST", comp:"SST · GA8-220601501-AA2-EV01", largo:"Infografía de acciones y estrategias en medio ambiente y SST", apertura:"2027-08-04", limite:"2027-08-10"},
+    {corto:"Maqueta de sonido", comp:"Técnico · GA8-250201021-AA1-EV03", largo:"Crear la maqueta de sonido según el guion técnico", apertura:"2027-08-11", limite:"2027-08-17"},
+    {corto:"Modelo financiero", comp:"Emprendimiento · GA8-240201529-AA3-EV01", largo:"Modelo financiero del emprendimiento", apertura:"2027-08-18", limite:"2027-08-24"},
+    {corto:"Escenas iluminadas", comp:"Técnico · GA8-220501084-AA1-EV05", largo:"Archivo fuente de las escenas iluminadas", apertura:"2027-08-25", limite:"2027-08-31"}
+  ]},
+  {id:"2027-09", orden:202709, nombre:"Septiembre 2027", corte:"2027-09-21", evidencias:[
+    {corto:"Render de una escena", comp:"Técnico · GA8-220501084-AA1-EV07", largo:"Render final de una escena del proyecto", apertura:"2027-09-01", limite:"2027-09-07"},
+    {corto:"Comic de mejora ambiental", comp:"SST · GA8-220601501-AA4-EV01", largo:"Comic sobre oportunidades de mejora en medio ambiente y SST", apertura:"2027-09-08", limite:"2027-09-14"},
+    {corto:"Exponer el proyecto", comp:"Técnico · GA8-250201022-AA1-EV03", largo:"Exponer el proyecto audiovisual", apertura:"2027-09-15", limite:"2027-09-21"}
+  ]},
+  {id:"2027-10", orden:202710, nombre:"Octubre 2027", corte:"2027-10-26", evidencias:[
+    {corto:"Ciudadanía laboral", comp:"Derechos fundamentales · GA9-210201501-AA2-EV01", largo:"Ciudadanía laboral y derechos del trabajador", apertura:"2027-09-29", limite:"2027-10-05"},
+    {corto:"Efectos auditivos", comp:"Técnico · GA9-220501084-AA1-EV04", largo:"Video de representación auditiva de efectos ambientales", apertura:"2027-10-06", limite:"2027-10-12"},
+    {corto:"Secuencias finalizadas", comp:"Técnico · GA9-220501085-AA1-EV01", largo:"Videos de secuencias finalizadas del producto audiovisual", apertura:"2027-10-13", limite:"2027-10-19"},
+    {corto:"Cabezote y créditos", comp:"Técnico · GA9-220501085-AA1-EV03", largo:"Cabezote y créditos", apertura:"2027-10-20", limite:"2027-10-26"}
+  ]},
+  {id:"2027-11", orden:202711, nombre:"Noviembre 2027", corte:"2027-11-30", evidencias:[
+    {corto:"Protección de derechos", comp:"Derechos fundamentales · GA9-210201501-AA3-EV01", largo:"Gráfico sobre los mecanismos de protección de los derechos fundamentales", apertura:"2027-10-27", limite:"2027-11-02"},
+    {corto:"Edición final de sonido", comp:"Técnico · GA9-220501085-AA2-EV01", largo:"Sincronización y edición final de los elementos sonoros", apertura:"2027-11-03", limite:"2027-11-09"},
+    {corto:"Composición final", comp:"Técnico · GA9-220501085-AA1-EV02", largo:"Composición final del audiovisual", apertura:"2027-11-10", limite:"2027-11-16"},
+    {corto:"Matemática intermedia", comp:"Matemáticas · GA10-240201528-AA2-EV01", largo:"Matemáticas intermedia", apertura:"2027-11-17", limite:"2027-11-23"},
+    {corto:"Estadística básica", comp:"Matemáticas · GA10-240201528-AA4-EV01", largo:"Estadística básica", apertura:"2027-11-17", limite:"2027-11-23"},
+    {corto:"Render del producto", comp:"Técnico · GA10-220501085-AA3-EV01", largo:"Genera el render del producto audiovisual", apertura:"2027-11-24", limite:"2027-11-30"}
+  ]},
+  {id:"2027-12", orden:202712, nombre:"Diciembre 2027", corte:"2027-12-14", evidencias:[
+    {corto:"Ajuste del producto final", comp:"Técnico · GA10-220501085-AA3-EV03", largo:"Ajuste del producto audiovisual final según evaluación", apertura:"2027-12-01", limite:"2027-12-07"},
+    {corto:"Pitch del audiovisual", comp:"Técnico · GA10-220501085-AA3-EV02", largo:"Presentación tipo pitch del audiovisual", apertura:"2027-12-07", limite:"2027-12-14"}
+  ]}
 ];
 const SEED_APR = [
   {id:"ap1", orden:1, nombre:"Yonalis Contreras García"},
@@ -136,19 +260,14 @@ const SEED_SEP = {
   ap9:{ev:[3,3,2,2], f:["","","26 de septiembre, 12:00 p. m.","27 de septiembre, 12:00 p. m."]}
 };
 const SEED_SEM = [
-  {mes:"2026-08", orden:1, etiqueta:"Semana 1", rango:"24 al 28 de agosto", lider:"ap6"},
-  {mes:"2026-09", orden:1, etiqueta:"Semana 1", rango:"1 al 4 de septiembre", lider:"ap9"},
-  {mes:"2026-09", orden:2, etiqueta:"Semana 2", rango:"7 al 11 de septiembre", lider:"ap5"},
-  {mes:"2026-09", orden:3, etiqueta:"Semana 3", rango:"14 al 18 de septiembre", lider:"ap3"},
-  {mes:"2026-09", orden:4, etiqueta:"Semana 4", rango:"21 al 25 de septiembre", lider:"ap1"},
-  {mes:"2026-09", orden:5, etiqueta:"Semana 5", rango:"28 de septiembre al 2 de octubre", lider:"ap7"},
-  {mes:"2026-10", orden:1, etiqueta:"Semana 1", rango:"5 al 9 de octubre", lider:"ap6"},
-  {mes:"2026-10", orden:2, etiqueta:"Semana 2", rango:"12 al 16 de octubre", lider:"ap9"},
-  {mes:"2026-10", orden:3, etiqueta:"Semana 3", rango:"19 al 23 de octubre", lider:"ap5"},
-  {mes:"2026-10", orden:4, etiqueta:"Semana 4", rango:"26 al 30 de octubre", lider:"ap3"}
+  {mes:"2026-08", orden:1, etiqueta:"Semana 1", rango:"24 al 28 de agosto", lider:"ap6"}
 ];
 
 let db = null, local = null;
+let esAdmin = false, usuario = null;
+const CLAVE_ADMIN = "phantom2026";   // cámbiala en esta línea cuando quieras
+const LLAVE_ADMIN = "phantom-admin";
+try{ esAdmin = localStorage.getItem(LLAVE_ADMIN) === "si"; }catch(e){}
 let meses = [], aprendices = [], registros = [], semanas = [];
 let mesActivo = null, abierto = null, sel = null, soloLectura = false;
 
@@ -170,7 +289,9 @@ function filasDelMes(){
       ap:a.id, nombre:a.nombre, nota:r.nota || "",
       evidencias: evs.map((_,i) => ({
         estado: ev[i] && typeof ev[i].estado === "number" && ev[i].estado < EST.length ? ev[i].estado : 0,
-        compromiso: ev[i] && ev[i].compromiso ? ev[i].compromiso : ""
+        compromiso: ev[i] && ev[i].compromiso ? ev[i].compromiso : "",
+        por: ev[i] && ev[i].por ? ev[i].por : "",
+        cuando: ev[i] && ev[i].cuando ? ev[i].cuando : ""
       }))
     };
   });
@@ -198,11 +319,54 @@ function textoPlazo(v){
   return /^\d{4}-\d{2}-\d{2}$/.test(v) ? fechaLarga(v) : v;
 }
 
+const FASES = [
+  {id:"f1", nombre:"Inducción y fase 1 · planear", desde:"2026-04", hasta:"2026-07"},
+  {id:"f2", nombre:"Fase 2 · análisis",            desde:"2026-08", hasta:"2026-12"},
+  {id:"f3", nombre:"Fase 3 · ejecutar",            desde:"2027-01", hasta:"2027-09"},
+  {id:"f4", nombre:"Fase 4 · evaluación",          desde:"2027-10", hasta:"2027-12"}
+];
+let faseActiva = null;
+
+function faseDe(mesId){
+  const f = FASES.find(x => mesId >= x.desde && mesId <= x.hasta);
+  return f ? f.id : (FASES[0] && FASES[0].id);
+}
+function mesesDeFase(fid){
+  const f = FASES.find(x => x.id === fid);
+  if(!f) return [];
+  return meses.filter(m => m.id >= f.desde && m.id <= f.hasta);
+}
+
 function pintarMeses(){
-  document.getElementById("meses").innerHTML = meses.map(m =>
+  const caja = document.getElementById("meses");
+  if(!meses.length){ caja.innerHTML = ""; return; }
+  if(!faseActiva) faseActiva = faseDe(mesActivo || meses[0].id);
+
+  let h = '<div class="fases">' + FASES.map(f => {
+    const n = mesesDeFase(f.id).length;
+    if(!n) return "";
+    return '<button class="fase" type="button" data-f="' + f.id + '" aria-expanded="' +
+      (faseActiva === f.id) + '">' + esc(f.nombre) + '<span>' + n + (n === 1 ? ' mes' : ' meses') + '</span></button>';
+  }).join("") + '</div>';
+
+  const lista = mesesDeFase(faseActiva);
+  h += '<div class="meses-fase">' + lista.map(m =>
     '<button class="mes" type="button" data-m="' + m.id + '" aria-pressed="' + (m.id === mesActivo) + '">' +
-    esc(m.nombre) + '</button>').join("");
-  document.querySelectorAll(".mes").forEach(b => b.addEventListener("click", () => {
+    esc(m.nombre) + '</button>').join("") + '</div>';
+  caja.innerHTML = h;
+
+  caja.querySelectorAll(".fase").forEach(b => b.addEventListener("click", () => {
+    faseActiva = faseActiva === b.dataset.f ? null : b.dataset.f;
+    if(faseActiva){
+      const ms = mesesDeFase(faseActiva);
+      if(ms.length && !ms.some(m => m.id === mesActivo)){
+        mesActivo = ms.some(m => m.id === mesDeHoy()) ? mesDeHoy() : ms[0].id;
+        abierto = null; pintarTodo(); return;
+      }
+    }
+    pintarMeses();
+  }));
+  caja.querySelectorAll(".mes").forEach(b => b.addEventListener("click", () => {
     mesActivo = b.dataset.m; abierto = null; pintarTodo();
   }));
 }
@@ -223,8 +387,39 @@ function pintarCorte(){
   else el.textContent = "El corte cierra el " + fecha + ", faltan " + dias + (dias === 1 ? " día" : " días");
 }
 
+let filtro = "", vista = "tabla";
+
+function visibles(){
+  const f = filtro.trim().toLowerCase();
+  return filasDelMes().filter(d => !f || d.nombre.toLowerCase().indexOf(f) !== -1);
+}
+
+function pintarTarjetas(){
+  const evs = evsDelMes(), filas = visibles();
+  const cont = document.getElementById("tabla");
+  if(!evs.length || !filas.length){
+    cont.innerHTML = '<tbody><tr><td class="name">' +
+      (evs.length ? "Ningún aprendiz coincide con la búsqueda." : "Este mes todavía no tiene evidencias cargadas.") +
+      '</td></tr></tbody>';
+    return;
+  }
+  let h = '';
+  filas.forEach(d => {
+    h += '<div class="tarj"><h3>' + esc(d.nombre) + '</h3><small>' +
+      (evs.length - pend(d)) + ' de ' + evs.length + ' calificadas</small><div class="celdas">';
+    d.evidencias.forEach((e,i) => {
+      h += '<button class="celda cell s' + e.estado + '" type="button" data-ap="' + d.ap + '" data-ev="' + i +
+        '"><b>' + esc(evs[i].corto) + '</b><span>' + esc(EST[e.estado]) + '</span></button>';
+    });
+    h += '</div></div>';
+  });
+  cont.innerHTML = '<div class="tarjetas">' + h + '</div>';
+  cont.querySelectorAll(".celda").forEach(b => b.addEventListener("click", abrir));
+}
+
 function pintarTabla(){
-  const evs = evsDelMes(), filas = filasDelMes();
+  if(vista === "tarjetas"){ pintarTarjetas(); pintarNotas(); return; }
+  const evs = evsDelMes(), filas = visibles();
   if(!evs.length || !filas.length){
     tabla.innerHTML = '<tbody><tr><td class="name">Este mes todavía no tiene evidencias cargadas.</td></tr></tbody>';
     return;
@@ -251,8 +446,120 @@ function pintarTabla(){
   h += '</tr></tfoot>';
   tabla.innerHTML = h;
   tabla.querySelectorAll(".cell").forEach(b => b.addEventListener("click", abrir));
-  notas.innerHTML = filas.filter(d => d.nota)
+  pintarNotas();
+}
+
+function pintarNotas(){
+  notas.innerHTML = filasDelMes().filter(d => d.nota)
     .map(d => '<p class="nota"><strong>' + esc(d.nombre) + ':</strong> ' + esc(d.nota) + '</p>').join("");
+}
+
+function textoGrupo(){
+  const m = mesActual(), evs = evsDelMes(), filas = filasDelMes();
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  let t = "*Tablero de evidencias · " + m.nombre + "*\n\n";
+  const pendientes = [];
+  evs.forEach((e,i) => {
+    const ref = esISO(e.limite) ? e.limite : (esISO(m.corte) ? m.corte : null);
+    if(!ref) return;
+    const p = ref.split("-").map(Number);
+    const f = new Date(p[0], p[1]-1, p[2]);
+    const dias = Math.round((f - hoy)/86400000);
+    if(dias < 0 || dias > 7) return;
+    const quienes = filas.filter(d => d.evidencias[i].estado !== 3).map(d => d.nombre.split(" ")[0]);
+    pendientes.push({e:e, dias:dias, quienes:quienes, fecha:fechaLarga(ref)});
+  });
+  if(!pendientes.length){
+    t += "No hay plazos que venzan esta semana.";
+  }else{
+    t += "_Plazos de esta semana:_\n";
+    pendientes.forEach(x => {
+      t += "\n*" + x.e.corto + "* · cierra el " + x.fecha +
+        (x.dias === 0 ? " (hoy)" : " (faltan " + x.dias + (x.dias === 1 ? " día" : " días") + ")") + "\n";
+      t += x.quienes.length ? "Faltan: " + x.quienes.join(", ") + "\n" : "Todos al día ✅\n";
+    });
+  }
+  const riesgo = filas.filter(d => vencidasSinReporte(d) > 0);
+  if(riesgo.length){
+    t += "\n_Con plazo vencido y sin reporte:_\n" + riesgo.map(d => "• " + d.nombre).join("\n") + "\n";
+  }
+  const lider = nombreLider(semanaDe(lunesDe(new Date())).lider);
+  t += "\nLidera esta semana: " + lider;
+  return t;
+}
+
+async function copiarTexto(t){
+  try{
+    await navigator.clipboard.writeText(t);
+    avisar("Mensaje copiado. Pégalo en el grupo.", true);
+  }catch(e){
+    const ta = document.createElement("textarea");
+    ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); avisar("Mensaje copiado. Pégalo en el grupo.", true); }
+    catch(e2){ avisar("No se pudo copiar. Selecciona el texto a mano."); }
+    document.body.removeChild(ta);
+  }
+}
+
+function descargarCSV(){
+  const m = mesActual(), evs = evsDelMes(), filas = filasDelMes();
+  const esc2 = v => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"';
+  const lineas = [];
+  lineas.push([esc2("Aprendiz")].concat(evs.map(e => esc2(e.corto))).concat([esc2("Calificadas")]).join(";"));
+  filas.forEach(d => {
+    lineas.push([esc2(d.nombre)]
+      .concat(d.evidencias.map(e => esc2(EST[e.estado] + (e.compromiso ? " · " + e.compromiso : ""))))
+      .concat([esc2((evs.length - pend(d)) + " de " + evs.length)]).join(";"));
+  });
+  lineas.push("");
+  lineas.push([esc2("Corte"), esc2(m.corte ? fechaLarga(m.corte) : "sin definir")].join(";"));
+  const csv = "\uFEFF" + lineas.join("\r\n");
+  try{
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csv], {type:"text/csv;charset=utf-8;"}));
+    a.download = "tablero-" + m.id + ".csv";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    avisar("Archivo descargado. Ábrelo con Excel.", true);
+  }catch(e){
+    copiarTexto(csv);
+  }
+}
+
+function armarHerramientas(){
+  const b = document.getElementById("buscar");
+  if(b && !b._listo){
+    b._listo = true;
+    b.addEventListener("input", () => { filtro = b.value; pintarTabla(); });
+  }
+  const vb = document.getElementById("btn-vista");
+  if(vb) vb.textContent = vista === "tabla" ? "Ver como tarjetas" : "Ver como tabla";
+  if(vb && !vb._listo){
+    vb._listo = true;
+    vb.addEventListener("click", () => {
+      vista = vista === "tabla" ? "tarjetas" : "tabla";
+      vb.textContent = vista === "tabla" ? "Ver como tarjetas" : "Ver como tabla";
+      try{ localStorage.setItem("phantom-vista", vista); }catch(e){}
+      pintarTabla();
+    });
+  }
+  const t = document.getElementById("btn-tema");
+  if(t && !t._listo){
+    t._listo = true;
+    t.addEventListener("click", () => {
+      const oscuro = document.documentElement.getAttribute("data-tema") === "oscuro";
+      document.documentElement.setAttribute("data-tema", oscuro ? "claro" : "oscuro");
+      t.setAttribute("aria-pressed", String(!oscuro));
+      t.textContent = oscuro ? "Modo oscuro" : "Modo claro";
+      try{ localStorage.setItem("phantom-tema", oscuro ? "claro" : "oscuro"); }catch(e){}
+    });
+  }
+  const csv = document.getElementById("btn-csv");
+  if(csv && !csv._listo){ csv._listo = true; csv.addEventListener("click", descargarCSV); }
+  const pdf = document.getElementById("btn-pdf");
+  if(pdf && !pdf._listo){ pdf._listo = true; pdf.addEventListener("click", () => window.print()); }
+  const wa = document.getElementById("btn-wa");
+  if(wa && !wa._listo){ wa._listo = true; wa.addEventListener("click", () => copiarTexto(textoGrupo())); }
 }
 
 function cuentaPorEstado(k){
@@ -283,41 +590,128 @@ function pintarDetalle(){
     : '<p>Ninguna evidencia está en este estado por ahora.</p>');
 }
 
-function pintarHistorico(){
-  const caja = document.getElementById("historico");
-  if(!meses.length || !aprendices.length){
-    caja.innerHTML = '<h2>Histórico por mes</h2><p class="vacio">Todavía no hay meses cargados.</p>';
+function pintarPlazos(){
+  const caja = document.getElementById("plazos");
+  const m = mesActual(), evs = evsDelMes(), filas = filasDelMes();
+  if(!m || !evs.length){
+    caja.innerHTML = '<h2>Cuenta regresiva por semana</h2><p class="vacio">Este mes todavía no tiene evidencias con plazo.</p>';
     return;
   }
   const hoy = new Date(); hoy.setHours(0,0,0,0);
-  let h = '<h2>Histórico por mes</h2><p class="cuenta">Cómo cerró cada mes. Toca uno para verlo en el tablero.</p><div class="hist">';
-  meses.slice().sort((a,b) => (b.orden||0) - (a.orden||0)).forEach(m => {
-    const evs = Array.isArray(m.evidencias) ? m.evidencias : [];
-    const total = evs.length * aprendices.length;
-    const cuenta = [0,0,0,0,0];
-    aprendices.forEach(a => {
-      const r = registros.find(x => x.mes === m.id && x.ap === a.id) || {};
-      const ev = Array.isArray(r.evidencias) ? r.evidencias : [];
-      evs.forEach((_,i) => {
-        const e = ev[i] && typeof ev[i].estado === "number" ? ev[i].estado : 0;
-        cuenta[e]++;
-      });
-    });
-    const pct = total ? Math.round(cuenta[3] / total * 100) : 0;
-    const p = (m.corte || "").split("-").map(Number);
-    const fcorte = p.length === 3 ? new Date(p[0], p[1]-1, p[2]) : null;
-    const estado = !fcorte ? "sin fecha de corte"
-      : fcorte < hoy ? "corte cerrado" : fcorte.getTime() === hoy.getTime() ? "el corte es hoy" : "corte pendiente";
-    h += '<button class="hist-fila' + (m.id === mesActivo ? ' activo' : '') + '" type="button" data-m="' + m.id + '">' +
-      '<span class="hist-cab"><b>' + esc(m.nombre) + '</b><span>' + pct + ' % calificadas</span></span>' +
-      '<span class="hist-barra">' + cuenta.map((n,i) => n ? '<i class="b' + i + '" style="width:' +
-        (total ? (n/total*100) : 0) + '%"></i>' : '').join("") + '</span>' +
-      '<span class="hist-pie">' + cuenta[3] + ' de ' + total + ' evidencias calificadas · ' +
-      cuenta[4] + ' sin entregar · ' + estado + '</span></button>';
+  const items = evs.map((e,i) => {
+    const ref = esISO(e.limite) ? e.limite : (esISO(m.corte) ? m.corte : null);
+    if(!ref) return null;
+    const p = ref.split("-").map(Number);
+    const f = new Date(p[0], p[1]-1, p[2]);
+    const faltan = filas.filter(d => d.evidencias[i] && d.evidencias[i].estado !== 3).length;
+    let avance = null;
+    if(esISO(e.apertura)){
+      const q = e.apertura.split("-").map(Number);
+      const ini = new Date(q[0], q[1]-1, q[2]);
+      const total = f - ini;
+      if(total > 0) avance = Math.max(0, Math.min(100, Math.round((hoy - ini) / total * 100)));
+    }
+    return {i:i, ev:e, fecha:f, dias: Math.round((f - hoy)/86400000), faltan:faltan,
+            propio: esISO(e.limite), lunes: lunesDe(f), avance: avance};
+  }).filter(x => x && x.dias >= 0).sort((a,b) => a.fecha - b.fecha);
+
+  if(!items.length){
+    caja.innerHTML = '<h2>Cuenta regresiva por semana</h2><p class="vacio">No hay plazos pendientes en este mes.</p>';
+    return;
+  }
+
+  let h = '<h2>Cuenta regresiva por semana</h2>' +
+    '<p class="cuenta">Cuántos días faltan para cada evidencia, agrupadas por la semana en que vence.</p>';
+  let semanaActual = null, enEstaSemana = false;
+  items.forEach(x => {
+    const clave = claveSemana(x.lunes);
+    if(clave !== semanaActual){
+      if(semanaActual !== null) h += '</div>';
+      semanaActual = clave;
+      const vie = new Date(x.lunes); vie.setDate(vie.getDate() + 4);
+      const esta = hoy >= x.lunes && hoy <= vie;
+      enEstaSemana = esta;
+      h += '<div class="semana-bloque' + (esta ? ' esta-semana' : '') + '"><div class="semana-tit"><b>Semana del ' +
+        textoRango(x.lunes) + '</b><span>lidera ' + esc(nombreLider(semanaDe(x.lunes).lider)) + '</span>' +
+        (esta ? '<b class="ahora">esta semana</b>' : '') + '</div>';
+    }
+    const d = x.dias;
+    const clase = d <= 2 ? "cd-urgente" : d <= 7 ? "cd-medio" : "cd-ok";
+    const texto = d === 0 ? "vence hoy" : "faltan " + d + (d === 1 ? " día" : " días");
+    h += '<div class="plazo-fila"><div><b>' + esc(x.ev.corto) + '</b><em>' +
+      (x.propio ? "plazo " : "fecha de corte ") + esc(fechaLarga(
+        x.fecha.getFullYear() + "-" + dosDig(x.fecha.getMonth()+1) + "-" + dosDig(x.fecha.getDate()))) +
+      ' · ' + x.faltan + ' de ' + filas.length + ' sin calificar</em></div>' +
+      (x.avance === null ? '' :
+        '<div class="avance" title="Avance del plazo"><i style="width:' + x.avance + '%"></i>' +
+        '<span>' + x.avance + ' % del plazo transcurrido</span></div>') +
+      '<div class="aviso-plazo">' +
+        (enEstaSemana && d >= 0 ? '<span class="campana" aria-hidden="true">🔔</span>' : '') +
+        '<span class="cuenta-dias ' + clase + '">' + texto + '</span></div></div>';
   });
-  caja.innerHTML = h + '</div>';
+  h += '</div>';
+  caja.innerHTML = h;
+}
+
+function resumenMes(m){
+  const evs = Array.isArray(m.evidencias) ? m.evidencias : [];
+  const total = evs.length * aprendices.length;
+  const cuenta = [0,0,0,0,0,0];
+  aprendices.forEach(a => {
+    const r = registros.find(x => x.mes === m.id && x.ap === a.id) || {};
+    const ev = Array.isArray(r.evidencias) ? r.evidencias : [];
+    evs.forEach((_,i) => {
+      const e = ev[i] && typeof ev[i].estado === "number" ? ev[i].estado : 0;
+      cuenta[e]++;
+    });
+  });
+  return {total:total, cuenta:cuenta, pct: total ? Math.round(cuenta[3]/total*100) : 0};
+}
+
+function pintarHistorico(){
+  const caja = document.getElementById("historico");
+  if(!meses.length || !aprendices.length){
+    caja.innerHTML = '<h2>Histórico por fase</h2><p class="vacio">Todavía no hay meses cargados.</p>';
+    return;
+  }
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  let h = '<h2>Histórico por fase</h2><p class="cuenta">Cómo va cada fase y cada uno de sus meses. Toca un mes para verlo en el tablero.</p>';
+
+  FASES.forEach(f => {
+    const lista = mesesDeFase(f.id).filter(m => Array.isArray(m.evidencias) && m.evidencias.length)
+      .sort((a,b) => (a.orden||0) - (b.orden||0));
+    if(!lista.length) return;
+    let total = 0, cal = 0, rojo = 0;
+    const resumenes = lista.map(m => {
+      const r = resumenMes(m);
+      total += r.total; cal += r.cuenta[3]; rojo += r.cuenta[4];
+      return {m:m, r:r};
+    });
+    const pct = total ? Math.round(cal/total*100) : 0;
+    const abierta = faseActiva === f.id;
+    h += '<details class="fase-hist"' + (abierta ? " open" : "") + '><summary>' +
+      '<span class="fh-nom"><b>' + esc(f.nombre) + '</b><em>' + lista.length +
+      (lista.length === 1 ? ' mes · ' : ' meses · ') + pct + ' % calificadas' +
+      (rojo ? ' · ' + rojo + ' sin entregar' : '') + '</em></span><span class="pcaret">▾</span></summary>';
+    h += '<div class="hist">';
+    resumenes.forEach(x => {
+      const m = x.m, r = x.r;
+      const p = (m.corte || "").split("-").map(Number);
+      const fcorte = p.length === 3 ? new Date(p[0], p[1]-1, p[2]) : null;
+      const estado = !fcorte ? "sin fecha de corte"
+        : fcorte < hoy ? "corte cerrado" : fcorte.getTime() === hoy.getTime() ? "el corte es hoy" : "corte pendiente";
+      h += '<button class="hist-fila' + (m.id === mesActivo ? ' activo' : '') + '" type="button" data-m="' + m.id + '">' +
+        '<span class="hist-cab"><b>' + esc(m.nombre) + '</b><span>' + r.pct + ' % calificadas</span></span>' +
+        '<span class="hist-barra">' + r.cuenta.map((n,i) => n ? '<i class="b' + i + '" style="width:' +
+          (r.total ? (n/r.total*100) : 0) + '%"></i>' : '').join("") + '</span>' +
+        '<span class="hist-pie">' + r.cuenta[3] + ' de ' + r.total + ' evidencias calificadas · ' +
+        r.cuenta[4] + ' sin entregar · ' + estado + '</span></button>';
+    });
+    h += '</div></details>';
+  });
+  caja.innerHTML = h;
   caja.querySelectorAll(".hist-fila").forEach(b => b.addEventListener("click", () => {
-    mesActivo = b.dataset.m; abierto = null; pintarTodo();
+    mesActivo = b.dataset.m; faseActiva = faseDe(mesActivo); abierto = null; pintarTodo();
     document.getElementById("historico").scrollIntoView({block:"nearest"});
   }));
 }
@@ -565,9 +959,19 @@ function pintarDestacados(){
           (vencidasSinReporte(x) === 1 ? " vencida" : " vencidas") + '</em>')
       : ['<em>ningún plazo vencido</em>']});
 
-  const otros = meses.filter(x => x.id !== m.id && Array.isArray(x.evidencias) && x.evidencias.length)
-    .sort((a,b) => (a.orden||0) - (b.orden||0));
-  slides.push({tono:"t-otro", titulo:"Actividad de otros meses",
+  // lo que viene después: el resto de meses de esta fase y, si ya no quedan, la fase siguiente
+  const fid = faseDe(m.id);
+  const iFase = FASES.findIndex(f => f.id === fid);
+  const conEv = x => Array.isArray(x.evidencias) && x.evidencias.length;
+  let otros = mesesDeFase(fid).filter(x => x.id > m.id && conEv(x));
+  let rotulo = "Lo que viene en esta fase";
+  if(!otros.length && iFase !== -1 && FASES[iFase+1]){
+    otros = mesesDeFase(FASES[iFase+1].id).filter(conEv);
+    rotulo = "Lo que viene en la " + FASES[iFase+1].nombre.toLowerCase();
+  }
+  otros = otros.sort((a,b) => (a.orden||0) - (b.orden||0)).slice(0, 3);
+
+  slides.push({tono:"t-otro", titulo:rotulo,
     gran: otros.length ? otros.length + (otros.length === 1 ? " mes" : " meses") : "—",
     items: otros.length ? otros.map(x => {
         const dd = diasHasta(x.corte);
@@ -578,12 +982,11 @@ function pintarDestacados(){
           x.evidencias.map(e => '<div class="sub-ev">' + esc(e.corto) +
             (e.limite ? ' <em>plazo: ' + esc(textoPlazo(e.limite)) + '</em>' : '') + '</div>').join("");
       })
-    : ['<em>no hay evidencias cargadas en otros meses</em>']});
+    : ['<em>no hay más meses con evidencias por delante</em>']});
 
   caja.innerHTML = '<h2>Destacados</h2>' +
     '<div class="slider" id="dest-slider">' +
       slides.map(sl => '<article class="slide ' + sl.tono + '">' +
-        '<span class="slide-mes">Lo importante de ' + esc(m.nombre.toLowerCase()) + '</span>' +
         '<h3>' + esc(sl.titulo) + '</h3>' +
         '<span class="gran">' + sl.gran + '</span><ul>' +
         sl.items.map(it => '<li>' + it + '</li>').join("") + '</ul></article>').join("") +
@@ -626,6 +1029,14 @@ function armarSlider(){
 let editando = null;        // índice de la evidencia que se está editando
 let modoNuevoMes = false;   // true cuando el formulario está creando un mes
 
+function mesDeHoy(){
+  const h = new Date();
+  const id = h.getFullYear() + "-" + dosDig(h.getMonth()+1);
+  if(meses.some(m => m.id === id)) return id;
+  const futuros = meses.filter(m => m.id >= id);
+  return futuros.length ? futuros[0].id : (meses.length ? meses[meses.length-1].id : null);
+}
+
 function mesSiguienteId(){
   let base = null;
   meses.forEach(m => { if(!base || (m.orden||0) > (base.orden||0)) base = m; });
@@ -655,6 +1066,97 @@ function aplicarLimites(inputId, mesId, ponerValor){
   if(ponerValor || !el.value) el.value = l.sugerido;
 }
 
+function pintarAprendices(){
+  const caja = document.getElementById("aprendices");
+  if(!esAdmin){
+    caja.innerHTML = '<h2>Aprendices del grupo</h2>' +
+      '<p class="cuenta">Agregar o quitar personas está reservado a quien coordina.</p>' +
+      '<div class="form"><div><label for="clave">Clave de coordinación</label>' +
+      '<input type="password" id="clave" placeholder="Escribe la clave"></div>' +
+      '<button type="button" id="btn-clave">Entrar</button>' +
+      '<p class="msg" id="clave-msg"></p></div>';
+    const btn = document.getElementById("btn-clave");
+    const entrar = () => {
+      const v = (document.getElementById("clave").value || "").trim();
+      if(v === CLAVE_ADMIN){
+        esAdmin = true;
+        try{ localStorage.setItem(LLAVE_ADMIN, "si"); }catch(e){}
+        pintarAprendices();
+      }else{
+        document.getElementById("clave-msg").textContent = "Esa clave no es.";
+      }
+    };
+    btn.addEventListener("click", entrar);
+    document.getElementById("clave").addEventListener("keydown", e => { if(e.key === "Enter") entrar(); });
+    return;
+  }
+
+  let h = '<h2>Aprendices del grupo</h2>' +
+    '<p class="cuenta">' + aprendices.length + ' personas en la lista' +
+    (usuario ? ' · entraste con tu cuenta' : '') + '</p><ul class="evlist">';
+  aprendices.forEach(a => {
+    h += '<li><div class="ev-txt"><b>' + esc(a.nombre) + '</b><em>' + esc(a.id) + '</em></div>' +
+      '<button type="button" class="mini del" data-quitar="' + a.id + '">Quitar</button></li>';
+  });
+  h += '</ul>';
+  h += '<div class="form bloque"><span class="etq">Agregar aprendiz</span>' +
+    '<input type="text" id="ap-nom" placeholder="Nombre y apellidos">' +
+    '<button type="button" id="ap-add">Agregar al grupo</button>' +
+    '<p class="msg" id="ap-msg"></p></div>';
+  if(!usuario){
+    h += '<p class="msg">Esta sesión quedó abierta en este navegador. Para cerrarla, ' +
+      '<button type="button" class="mini sec" id="ap-salir">salir del modo coordinación</button></p>';
+  }
+  caja.innerHTML = h;
+
+  document.getElementById("ap-add").addEventListener("click", agregarAprendiz);
+  caja.querySelectorAll("[data-quitar]").forEach(b =>
+    b.addEventListener("click", () => quitarAprendiz(b.dataset.quitar)));
+  const salir = document.getElementById("ap-salir");
+  if(salir) salir.addEventListener("click", () => {
+    esAdmin = false;
+    try{ localStorage.removeItem(LLAVE_ADMIN); }catch(e){}
+    pintarAprendices();
+  });
+}
+
+async function agregarAprendiz(){
+  const inp = document.getElementById("ap-nom");
+  const nom = (inp.value || "").trim();
+  const msg = document.getElementById("ap-msg");
+  if(!nom){ msg.textContent = "Escribe el nombre."; return; }
+  const id = "ap" + Date.now().toString(36);
+  const orden = aprendices.reduce((n,a) => Math.max(n, a.orden || 0), 0) + 1;
+  aprendices.push({id:id, nombre:nom, orden:orden});
+  msg.textContent = "Guardando…";
+  await guardar("aprendices", id, {nombre:nom, orden:orden});
+  pintarTodo();
+  const m2 = document.getElementById("ap-msg");
+  if(m2) m2.textContent = nom + " quedó en el grupo.";
+}
+
+async function quitarAprendiz(id){
+  const a = aprendices.find(x => x.id === id);
+  if(!a) return;
+  if(!window.confirm("¿Quitar a " + a.nombre + " del grupo? También se borran sus marcas en todos los meses.")) return;
+  aprendices = aprendices.filter(x => x.id !== id);
+  const suyos = registros.filter(r => r.ap === id);
+  registros = registros.filter(r => r.ap !== id);
+  guardarLocal();
+  if(db){
+    try{
+      await db.doc("aprendices/" + id).delete();
+      for(const r of suyos) await db.doc("registros/" + r.id).delete();
+      avisar("Aprendiz retirado del grupo.", true);
+    }catch(e){
+      avisar("No se pudo retirar en la nube (" + ((e && e.code) || "error") + ").");
+    }
+  }else{
+    avisar("Aprendiz retirado en este navegador.", true);
+  }
+  pintarTodo();
+}
+
 function pintarNuevo(){
   const caja = document.getElementById("nuevo");
   if(soloLectura){
@@ -681,7 +1183,7 @@ function pintarNuevo(){
         '<div><label for="n-mes">Mes</label><input id="n-mes" type="month" value="' + sig + '"></div>' +
         '<div><label for="n-corte">Fecha del corte</label><input id="n-corte" type="date"></div>' +
       '</div>' +
-      '<p class="msg">El mes se crea vacío. Sus evidencias se agregan aquí mismo, eligiéndolo luego en la lista de arriba.</p>' +
+      '<p class="msg">El mes se crea con cuatro evidencias en blanco. Luego las editas aquí mismo con su nombre, componente y plazo.</p>' +
       '<button type="button" id="n-crear">Crear mes</button>' +
       '<p class="msg" id="n-msg"></p></div>';
     caja.innerHTML = h;
@@ -710,6 +1212,8 @@ function pintarNuevo(){
           h += '<li class="edit"><div class="fila tres">' +
             '<input type="text" class="ed-nom" value="' + esc(e.corto) + '" placeholder="Nombre">' +
             '<input type="text" class="ed-comp" value="' + esc(e.comp || "") + '" placeholder="Componente y código">' +
+            '<div class="campo"><label>Apertura</label><input type="date" class="ed-ap" value="' +
+              esc(esISO(e.apertura) ? e.apertura : "") + '"></div>' +
             '<div class="campo"><label>Plazo</label><input type="date" class="ed-lim" value="' +
               esc(esISO(e.limite) ? e.limite : "") + '"></div>' +
             '</div><div class="acciones">' +
@@ -730,6 +1234,7 @@ function pintarNuevo(){
       '<div class="fila tres">' +
         '<input type="text" id="a-nom" placeholder="Construir el video del animatic">' +
         '<input type="text" id="a-comp" placeholder="Técnico · GA4-250201021-AA2-EV01">' +
+        '<div class="campo"><label for="a-ap">Apertura</label><input type="date" id="a-ap"></div>' +
         '<div class="campo"><label for="a-lim">Plazo de entrega</label><input type="date" id="a-lim"></div>' +
       '</div>' +
       '<button type="button" id="a-add">Crear evidencia</button>' +
@@ -758,7 +1263,7 @@ function cambiarMesForm(ev){
   const v = ev.target.value;
   editando = null;
   if(v === "__nuevo"){ modoNuevoMes = true; pintarNuevo(); return; }
-  modoNuevoMes = false; mesActivo = v; abierto = null; pintarTodo();
+  modoNuevoMes = false; mesActivo = v; faseActiva = faseDe(v); abierto = null; pintarTodo();
 }
 
 async function guardarEvidencia(i){
@@ -770,6 +1275,7 @@ async function guardarEvidencia(i){
   const evs = (m.evidencias || []).slice();
   evs[i] = {corto: nom, largo: nom,
     comp: li.querySelector(".ed-comp").value.trim() || "Por definir",
+    apertura: (li.querySelector(".ed-ap") || {}).value || "",
     limite: li.querySelector(".ed-lim").value.trim()};
   m.evidencias = evs;
   editando = null;
@@ -809,10 +1315,11 @@ async function agregarEvidencia(){
   const nom = document.getElementById("a-nom").value.trim();
   const comp = document.getElementById("a-comp").value.trim();
   const lim = document.getElementById("a-lim").value.trim();
+  const ap = (document.getElementById("a-ap") || {}).value || "";
   if(!nom){ msg.textContent = "Escribe el nombre de la evidencia."; return; }
   const m = mesActual(); if(!m) return;
   const evs = (Array.isArray(m.evidencias) ? m.evidencias : []).slice();
-  evs.push({corto: nom, comp: comp || "Por definir", largo: nom, limite: lim});
+  evs.push({corto: nom, comp: comp || "Por definir", largo: nom, limite: lim, apertura: ap});
   m.evidencias = evs;
   msg.textContent = "Guardando…";
   await guardar("meses", m.id, {orden:m.orden, nombre:m.nombre, corte:m.corte || "", evidencias:evs});
@@ -839,7 +1346,8 @@ async function crearMes(){
   if(meses.some(x => x.id === mesVal)){ msg.textContent = "Ese mes ya existe. Agrégale evidencias arriba."; return; }
   const p = mesVal.split("-").map(Number);
   const nombre = MESES_ES[p[1]-1].charAt(0).toUpperCase() + MESES_ES[p[1]-1].slice(1) + " " + p[0];
-  const doc = {orden: p[0]*100 + p[1], nombre: nombre, corte: corte || "", evidencias: []};
+  const base = [1,2,3,4].map(n => ({corto: "Evidencia " + n, comp: "Por definir", largo: "Evidencia " + n, limite: ""}));
+  const doc = {orden: p[0]*100 + p[1], nombre: nombre, corte: corte || "", evidencias: base};
   msg.textContent = "Creando el mes…";
   meses.push(Object.assign({id: mesVal}, doc));
   meses.sort((a,b) => (a.orden||0) - (b.orden||0));
@@ -848,12 +1356,33 @@ async function crearMes(){
   await guardar("meses", mesVal, doc);
   pintarTodo();
   const m2 = document.getElementById("n-msg");
-  if(m2) m2.textContent = "Mes creado.";
+  if(m2) m2.textContent = "Mes creado con cuatro evidencias en blanco.";
+}
+
+let _repintando = null;
+function repintar(){           // junta varios avisos de la nube en un solo repintado
+  clearTimeout(_repintando);
+  _repintando = setTimeout(pintarTodo, 80);
 }
 
 function pintarTodo(){
+  const scroll = window.scrollY;
+  const abiertos = [...document.querySelectorAll(".plist details[open] .pcab b")].map(b => b.textContent);
+  const pista = document.getElementById("dest-slider");
+  const lamina = pista && pista.clientWidth ? Math.round(pista.scrollLeft / pista.clientWidth) : 0;
+  pintarSecciones();
+  const nueva = document.getElementById("dest-slider");
+  if(nueva && lamina) nueva.scrollLeft = lamina * nueva.clientWidth;
+  document.querySelectorAll(".plist details").forEach(det => {
+    const b = det.querySelector(".pcab b");
+    if(b && abiertos.indexOf(b.textContent) !== -1) det.open = true;
+  });
+  if(Math.abs(window.scrollY - scroll) > 2) window.scrollTo(0, scroll);
+}
+
+function pintarSecciones(){
   pintarMeses(); pintarCorte(); pintarDestacados(); pintarStats(); pintarTabla();
-  pintarHistorico(); pintarRiesgo(); pintarAlDia(); pintarTurno(); pintarLideres(); pintarNuevo();
+  armarHerramientas(); pintarAprendices(); pintarPlazos(); pintarHistorico(); pintarRiesgo(); pintarAlDia(); pintarTurno(); pintarLideres(); pintarNuevo();
 }
 
 function abrir(ev){
@@ -875,6 +1404,15 @@ function pintarSheet(){
     cambiar(sel.ap, sel.ev, {estado: +btn.dataset.est});
   }));
   document.getElementById("sh-fecha").value = e.compromiso || "";
+  const firma = document.getElementById("sh-firma");
+  if(firma){
+    firma.innerHTML = '<label for="sh-quien">Marco como</label>' +
+      '<input id="sh-quien" type="text" placeholder="Tu nombre" value="' + esc(quien) + '">' +
+      (e.por ? '<p class="sello">Última marca: ' + esc(e.por) + ' · ' + esc(e.cuando || "") + '</p>' : '');
+    const inp = document.getElementById("sh-quien");
+    inp.addEventListener("change", () => guardarQuien(inp.value.trim()));
+    inp.addEventListener("blur", () => guardarQuien(inp.value.trim()));
+  }
 }
 function cerrarSheet(){
   if(sel){
@@ -899,9 +1437,11 @@ function cambiar(ap, i, campos){
   const evs = evsDelMes();
   const base = evs.map((_,k) => ({
     estado: r.evidencias[k] && typeof r.evidencias[k].estado === "number" ? r.evidencias[k].estado : 0,
-    compromiso: r.evidencias[k] && r.evidencias[k].compromiso ? r.evidencias[k].compromiso : ""
+    compromiso: r.evidencias[k] && r.evidencias[k].compromiso ? r.evidencias[k].compromiso : "",
+    por: r.evidencias[k] && r.evidencias[k].por ? r.evidencias[k].por : "",
+    cuando: r.evidencias[k] && r.evidencias[k].cuando ? r.evidencias[k].cuando : ""
   }));
-  Object.assign(base[i], campos);
+  Object.assign(base[i], campos, {por: quien || "sin firmar", cuando: selloHoy()});
   r.evidencias = base;
   pintarTodo();
   if(sel) pintarSheet();
@@ -962,7 +1502,7 @@ function modoLocal(){
   }));
   semanas = (g && Array.isArray(g.semanas)) ? g.semanas
     : SEED_SEM.map(s => Object.assign({id: s.mes + "__s" + s.orden}, s));
-  mesActivo = mesActivo || (meses.find(m => m.id === "2026-09") ? "2026-09" : meses[0].id);
+  mesActivo = mesActivo || mesDeHoy();
   pintarTodo();
 }
 
@@ -971,8 +1511,8 @@ function suscribir(store){
   const sub = (col, cb) => db.collection(col).onSnapshot(snap => {
     cb(snap.docs.map(d => Object.assign({id:d.id}, d.data())));
     if(meses.length && aprendices.length){
-      if(!mesActivo || !meses.some(m => m.id === mesActivo)) mesActivo = meses.find(m => m.id === "2026-09") ? "2026-09" : meses[meses.length-1].id;
-      pintarTodo();
+      if(!mesActivo || !meses.some(m => m.id === mesActivo)) mesActivo = mesDeHoy();
+      repintar();
     }
   }, () => { aviso.hidden = false; aviso.textContent = "Se perdió la conexión con el tablero. Vuelve a cargar la página."; });
   sub("meses", d => { meses = d.sort((a,b) => (a.orden||0) - (b.orden||0)); });
@@ -981,7 +1521,15 @@ function suscribir(store){
   sub("semanas", d => { semanas = d; });
 }
 
-const VERSION = "1.5 · 4 de octubre de 2026";
+const VERSION = "2.0 · 6 de octubre de 2026";
+try{
+  const temaGuardado = localStorage.getItem("phantom-tema");
+  if(temaGuardado) document.documentElement.setAttribute("data-tema", temaGuardado);
+}catch(e){}
+try{
+  const vistaGuardada = localStorage.getItem("phantom-vista");
+  if(vistaGuardada === "tarjetas" || vistaGuardada === "tabla") vista = vistaGuardada;
+}catch(e){}
 const elVer = document.getElementById("version");
 const elAnio = document.getElementById("anio");
 if(elAnio) elAnio.textContent = new Date().getFullYear();
@@ -993,6 +1541,11 @@ function marcarModo(compartido){
 }
 
 if(typeof claude !== "undefined" && claude && typeof claude.use === "function"){
+  claude.use("user").then(u => {
+    if(!u) return;
+    usuario = u;
+    if(u.canEdit && u.canEdit()){ esAdmin = true; pintarAprendices(); }
+  }).catch(() => {});
   claude.use("db").then(store => {
     if(store){ marcarModo(true); suscribir(store); }
     else { marcarModo(false); modoLocal(); }
