@@ -163,8 +163,10 @@ function nombreHoja(mid){
   return ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"][+p[1]-1] + " " + p[0];
 }
 
-async function puenteLeer(){
+async function puenteLeer(forzado){
   if(!PUENTE) return;
+  if(!forzado && Date.now() - puenteUltimo < 25000) return;   // acaba de escribir: no se pisa
+  if(puenteEnvio) return;                                      // hay un envío en cola
   try{
     const r = await fetch(PUENTE + "?t=" + Date.now());
     const j = await r.json();
@@ -179,6 +181,7 @@ async function puenteLeer(){
         const id = m.id + "__" + a.id;
         let r2 = registros.find(x => x.id === id);
         if(!r2){ r2 = {id:id, mes:m.id, ap:a.id, orden:a.orden, evidencias:[]}; registros.push(r2); }
+        if(!aprendices.some(x => x.nombre === fila.nombre)) return;   // alguien retirado: se ignora
         fila.estados.forEach((txt,i) => {
           const e = EST.indexOf(txt);
           if(e === -1) return;
@@ -197,7 +200,7 @@ function puenteEscribir(){
   if(!PUENTE) return;
   clearTimeout(puenteEnvio);
   puenteEnvio = setTimeout(async () => {
-    const payload = {meses:{}};
+    const payload = {meses:{}, aprendices: aprendices.map(a => a.nombre)};
     meses.forEach(m => {
       const evs = Array.isArray(m.evidencias) ? m.evidencias : [];
       if(!evs.length) return;
@@ -213,7 +216,9 @@ function puenteEscribir(){
       await fetch(PUENTE, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"},
                            body: JSON.stringify(payload)});
       puenteUltimo = Date.now();
+      puenteEnvio = null;
     }catch(e){
+      puenteEnvio = null;
       avisar("El cambio quedó guardado aquí, pero no se pudo escribir en la hoja de cálculo.");
     }
   }, 1200);
@@ -1274,6 +1279,7 @@ async function quitarVarios(ids){
   aprendices = aprendices.filter(a => ids.indexOf(a.id) === -1);
   registros = registros.filter(r => ids.indexOf(r.ap) === -1);
   guardarLocal();
+  puenteUltimo = Date.now();
   if(db){
     try{
       for(const id of ids) await db.doc("aprendices/" + id).delete();
@@ -1655,7 +1661,7 @@ function modoLocal(){
     : SEED_SEM.map(s => Object.assign({id: s.mes + "__s" + s.orden}, s));
   mesActivo = mesActivo || mesDeHoy();
   pintarTodo();
-  puenteLeer();
+  puenteLeer(true);
   nubeLeer();
   if(PUENTE) setInterval(puenteLeer, 120000);   // revisa la hoja cada dos minutos
   if(NUBE) setInterval(nubeLeer, 60000);        // revisa la nube cada minuto
@@ -1676,7 +1682,7 @@ function suscribir(store){
   sub("semanas", d => { semanas = d; });
 }
 
-const VERSION = "2.6 · 8 de octubre de 2026";
+const VERSION = "2.7 · 8 de octubre de 2026";
 try{
   const temaGuardado = localStorage.getItem("phantom-tema");
   if(temaGuardado) document.documentElement.setAttribute("data-tema", temaGuardado);
