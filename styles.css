@@ -255,6 +255,11 @@ tfoot td.name{text-align:left;font-size:.78rem;font-weight:600;font-style:normal
 .caja.aldia{background:var(--arena)}
 .caja.aprendices{background:var(--gris-2)}
 .caja.aprendices h2{color:var(--navy)}
+.lista-ap li{align-items:center}
+.ap-fila{display:flex;align-items:center;gap:10px;flex:1;min-width:0;cursor:pointer}
+.ap-fila input{width:18px;height:18px;accent-color:var(--navy);flex:0 0 auto}
+.acciones-ap{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.acciones-ap .msg{font-style:italic}
 .caja.aldia .pnum.ok{background:var(--verde);color:#fff}
 .caja.lideres{background:var(--panel);border-color:var(--line)}
 .caja.turno{background:var(--verde);color:#fff}

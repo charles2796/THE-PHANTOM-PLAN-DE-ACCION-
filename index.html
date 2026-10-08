@@ -114,6 +114,110 @@ const EST = ["Sin novedad","En desarrollo","Se entrega","Calificada","No entrega
 const LLAVE = "phantom-evidencias-v3";
 const LLAVE_QUIEN = "phantom-quien";
 const CRONOGRAMA_V = 3;   // sube este número cada vez que cambie el cronograma
+
+/* ---- Puente con Google Sheets -------------------------------------------
+   Pega entre las comillas la URL del Apps Script que termina en /exec.
+   Con la URL puesta, el tablero lee de la hoja al abrir y le escribe cada
+   marca. Sin URL, todo sigue funcionando guardando en este navegador.      */
+const PUENTE = "https://script.google.com/macros/s/AKfycby4FUytL0ETd9qFDvxQ1f2Zrol3LyHsI1YROKElGmgJFHuXR3mbhu8_0jsyIksSgsgSJw/exec";
+
+/* ---- Opción B: Firebase, sin hoja de cálculo -----------------------------
+   Más simple: una sola dirección, sin claves ni librerías.
+   Pega aquí la URL de tu base, con /tablero.json al final. Ejemplo:
+   https://the-phantom-default-rtdb.firebaseio.com/tablero.json              */
+const NUBE = "";
+let nubeEnvio = null;
+
+async function nubeLeer(){
+  if(!NUBE) return;
+  try{
+    const r = await fetch(NUBE + "?t=" + Date.now());
+    const g = await r.json();
+    if(!g || !g.meses) return;
+    meses = g.meses; registros = g.registros || []; semanas = g.semanas || [];
+    if(Array.isArray(g.aprendices) && g.aprendices.length) aprendices = g.aprendices;
+    if(!mesActivo || !meses.some(m => m.id === mesActivo)) mesActivo = mesDeHoy();
+    pintarTodo();
+  }catch(e){
+    avisar("No se pudo leer la nube. Revisa la conexión o la dirección.");
+  }
+}
+
+function nubeGuardar(){
+  if(!NUBE) return;
+  clearTimeout(nubeEnvio);
+  nubeEnvio = setTimeout(async () => {
+    try{
+      await fetch(NUBE, {method:"PUT", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({cronograma:CRONOGRAMA_V, meses:meses, registros:registros,
+                              semanas:semanas, aprendices:aprendices})});
+    }catch(e){
+      avisar("El cambio quedó guardado aquí, pero no se pudo subir a la nube.");
+    }
+  }, 1000);
+}
+let puenteEnvio = null, puenteUltimo = 0;
+
+function nombreHoja(mid){
+  const p = mid.split("-");
+  return ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"][+p[1]-1] + " " + p[0];
+}
+
+async function puenteLeer(){
+  if(!PUENTE) return;
+  try{
+    const r = await fetch(PUENTE + "?t=" + Date.now());
+    const j = await r.json();
+    if(!j || !j.ok || !j.datos) return;
+    let cambios = 0;
+    Object.keys(j.datos.meses || {}).forEach(nombre => {
+      const m = meses.find(x => nombreHoja(x.id) === nombre);
+      if(!m) return;
+      (j.datos.meses[nombre].filas || []).forEach(fila => {
+        const a = aprendices.find(x => x.nombre === fila.nombre);
+        if(!a) return;
+        const id = m.id + "__" + a.id;
+        let r2 = registros.find(x => x.id === id);
+        if(!r2){ r2 = {id:id, mes:m.id, ap:a.id, orden:a.orden, evidencias:[]}; registros.push(r2); }
+        fila.estados.forEach((txt,i) => {
+          const e = EST.indexOf(txt);
+          if(e === -1) return;
+          if(!r2.evidencias[i]) r2.evidencias[i] = {estado:0, compromiso:"", por:"", cuando:""};
+          if(r2.evidencias[i].estado !== e){ r2.evidencias[i].estado = e; cambios++; }
+        });
+      });
+    });
+    if(cambios){ guardarLocal(); pintarTodo(); avisar("Tablero sincronizado con la hoja de cálculo.", true); }
+  }catch(e){
+    avisar("No se pudo leer la hoja de cálculo. Revisa la conexión o el enlace del puente.");
+  }
+}
+
+function puenteEscribir(){
+  if(!PUENTE) return;
+  clearTimeout(puenteEnvio);
+  puenteEnvio = setTimeout(async () => {
+    const payload = {meses:{}};
+    meses.forEach(m => {
+      const evs = Array.isArray(m.evidencias) ? m.evidencias : [];
+      if(!evs.length) return;
+      const filas = aprendices.map(a => {
+        const r = registros.find(x => x.mes === m.id && x.ap === a.id) || {};
+        const ev = Array.isArray(r.evidencias) ? r.evidencias : [];
+        return {nombre: a.nombre,
+                estados: evs.map((_,i) => EST[(ev[i] && ev[i].estado) || 0])};
+      });
+      payload.meses[nombreHoja(m.id)] = {filas: filas};
+    });
+    try{
+      await fetch(PUENTE, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"},
+                           body: JSON.stringify(payload)});
+      puenteUltimo = Date.now();
+    }catch(e){
+      avisar("El cambio quedó guardado aquí, pero no se pudo escribir en la hoja de cálculo.");
+    }
+  }, 1200);
+}
 let quien = "";
 try{ quien = localStorage.getItem(LLAVE_QUIEN) || ""; }catch(e){ quien = ""; }
 function guardarQuien(v){
@@ -1101,12 +1205,20 @@ function pintarAprendices(){
 
   let h = '<h2>Aprendices del grupo</h2>' +
     '<p class="cuenta">' + aprendices.length + ' personas en la lista' +
-    (usuario ? ' · entraste con tu cuenta' : '') + '</p><ul class="evlist">';
+    (usuario ? ' · entraste con tu cuenta' : '') +
+    '. Marca a quienes quieras retirar, o usa el botón de cada fila.</p>' +
+    '<ul class="evlist lista-ap">';
   aprendices.forEach(a => {
-    h += '<li><div class="ev-txt"><b>' + esc(a.nombre) + '</b><em>' + esc(a.id) + '</em></div>' +
+    const p = pendientesDe(a.id);
+    h += '<li><label class="ap-fila"><input type="checkbox" class="ap-sel" value="' + a.id + '">' +
+      '<span class="ev-txt"><b>' + esc(a.nombre) + '</b><em>' + p + '</em></span></label>' +
       '<button type="button" class="mini del" data-quitar="' + a.id + '">Quitar</button></li>';
   });
   h += '</ul>';
+  h += '<div class="acciones-ap">' +
+    '<button type="button" class="mini sec" id="ap-todos">Marcar todos</button>' +
+    '<button type="button" class="mini del" id="ap-varios">Quitar seleccionados</button>' +
+    '<span class="msg" id="ap-cuenta">0 seleccionados</span></div>';
   h += '<div class="form bloque"><span class="etq">Agregar aprendiz</span>' +
     '<input type="text" id="ap-nom" placeholder="Nombre y apellidos">' +
     '<button type="button" id="ap-add">Agregar al grupo</button>' +
@@ -1117,15 +1229,64 @@ function pintarAprendices(){
   }
   caja.innerHTML = h;
 
+  const marcados = () => [...caja.querySelectorAll(".ap-sel:checked")].map(c => c.value);
+  const contar = () => {
+    const n = marcados().length;
+    document.getElementById("ap-cuenta").textContent =
+      n === 0 ? "0 seleccionados" : n === 1 ? "1 seleccionado" : n + " seleccionados";
+  };
+  caja.querySelectorAll(".ap-sel").forEach(c => c.addEventListener("change", contar));
+  document.getElementById("ap-todos").addEventListener("click", () => {
+    const todos = caja.querySelectorAll(".ap-sel");
+    const faltan = [...todos].some(c => !c.checked);
+    todos.forEach(c => { c.checked = faltan; });
+    contar();
+  });
+  document.getElementById("ap-varios").addEventListener("click", () => quitarVarios(marcados()));
   document.getElementById("ap-add").addEventListener("click", agregarAprendiz);
   caja.querySelectorAll("[data-quitar]").forEach(b =>
-    b.addEventListener("click", () => quitarAprendiz(b.dataset.quitar)));
+    b.addEventListener("click", () => quitarVarios([b.dataset.quitar])));
   const salir = document.getElementById("ap-salir");
   if(salir) salir.addEventListener("click", () => {
     esAdmin = false;
     try{ localStorage.removeItem(LLAVE_ADMIN); }catch(e){}
     pintarAprendices();
   });
+}
+
+function pendientesDe(id){
+  let marcas = 0;
+  registros.filter(r => r.ap === id).forEach(r => {
+    (r.evidencias || []).forEach(e => { if(e && e.estado && e.estado !== 0) marcas++; });
+  });
+  return marcas ? marcas + (marcas === 1 ? " casilla marcada" : " casillas marcadas") : "sin marcas todavía";
+}
+
+async function quitarVarios(ids){
+  if(!ids || !ids.length){ avisar("No marcaste a nadie."); return; }
+  const nombres = ids.map(id => (aprendices.find(a => a.id === id) || {}).nombre).filter(Boolean);
+  const texto = nombres.length === 1
+    ? "¿Quitar a " + nombres[0] + " del grupo? También se borran sus marcas en todos los meses."
+    : "¿Quitar del grupo a " + nombres.length + " personas?\n\n" + nombres.join("\n") +
+      "\n\nTambién se borran sus marcas en todos los meses.";
+  if(!window.confirm(texto)) return;
+  const suyos = registros.filter(r => ids.indexOf(r.ap) !== -1);
+  aprendices = aprendices.filter(a => ids.indexOf(a.id) === -1);
+  registros = registros.filter(r => ids.indexOf(r.ap) === -1);
+  guardarLocal();
+  if(db){
+    try{
+      for(const id of ids) await db.doc("aprendices/" + id).delete();
+      for(const r of suyos) await db.doc("registros/" + r.id).delete();
+      avisar(nombres.length === 1 ? nombres[0] + " salió del grupo."
+        : nombres.length + " personas salieron del grupo.", true);
+    }catch(e){
+      avisar("No se pudo retirar en la nube (" + ((e && e.code) || "error") + ").");
+    }
+  }else{
+    avisar("Retirado en este navegador.", true);
+  }
+  pintarTodo();
 }
 
 async function agregarAprendiz(){
@@ -1141,28 +1302,6 @@ async function agregarAprendiz(){
   pintarTodo();
   const m2 = document.getElementById("ap-msg");
   if(m2) m2.textContent = nom + " quedó en el grupo.";
-}
-
-async function quitarAprendiz(id){
-  const a = aprendices.find(x => x.id === id);
-  if(!a) return;
-  if(!window.confirm("¿Quitar a " + a.nombre + " del grupo? También se borran sus marcas en todos los meses.")) return;
-  aprendices = aprendices.filter(x => x.id !== id);
-  const suyos = registros.filter(r => r.ap === id);
-  registros = registros.filter(r => r.ap !== id);
-  guardarLocal();
-  if(db){
-    try{
-      await db.doc("aprendices/" + id).delete();
-      for(const r of suyos) await db.doc("registros/" + r.id).delete();
-      avisar("Aprendiz retirado del grupo.", true);
-    }catch(e){
-      avisar("No se pudo retirar en la nube (" + ((e && e.code) || "error") + ").");
-    }
-  }else{
-    avisar("Aprendiz retirado en este navegador.", true);
-  }
-  pintarTodo();
 }
 
 function pintarNuevo(){
@@ -1491,6 +1630,8 @@ function buscarDoc(col, id){
   const copia = Object.assign({}, d); delete copia.id; return copia;
 }
 function guardarLocal(){
+  puenteEscribir();
+  nubeGuardar();
   try{
     localStorage.setItem(LLAVE, JSON.stringify({cronograma:CRONOGRAMA_V, registros:registros, semanas:semanas, meses:meses}));
   }catch(e){
@@ -1514,6 +1655,10 @@ function modoLocal(){
     : SEED_SEM.map(s => Object.assign({id: s.mes + "__s" + s.orden}, s));
   mesActivo = mesActivo || mesDeHoy();
   pintarTodo();
+  puenteLeer();
+  nubeLeer();
+  if(PUENTE) setInterval(puenteLeer, 120000);   // revisa la hoja cada dos minutos
+  if(NUBE) setInterval(nubeLeer, 60000);        // revisa la nube cada minuto
 }
 
 function suscribir(store){
@@ -1531,7 +1676,7 @@ function suscribir(store){
   sub("semanas", d => { semanas = d; });
 }
 
-const VERSION = "2.2 · 6 de octubre de 2026";
+const VERSION = "2.6 · 8 de octubre de 2026";
 try{
   const temaGuardado = localStorage.getItem("phantom-tema");
   if(temaGuardado) document.documentElement.setAttribute("data-tema", temaGuardado);
@@ -1547,7 +1692,7 @@ if(elAnio) elAnio.textContent = new Date().getFullYear();
 function marcarModo(compartido){
   if(elVer) elVer.textContent = "Versión " + VERSION + " · " +
     (compartido ? "los cambios se guardan para todo el grupo"
-                : "los cambios se guardan solo en este navegador");
+                : (NUBE ? "guardando en la nube, el grupo ve lo mismo" : PUENTE ? "conectado con la hoja de c\u00e1lculo" : "los cambios se guardan solo en este navegador"));
 }
 
 if(typeof claude !== "undefined" && claude && typeof claude.use === "function"){
