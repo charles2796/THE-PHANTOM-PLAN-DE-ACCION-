@@ -113,7 +113,7 @@
 const EST = ["Sin novedad","En desarrollo","Se entrega","Calificada","No entregado","Entregado tarde"];
 const LLAVE = "phantom-evidencias-v3";
 const LLAVE_QUIEN = "phantom-quien";
-const CRONOGRAMA_V = 3;   // sube este número cada vez que cambie el cronograma
+const CRONOGRAMA_V = 5;   // sube este número cada vez que cambie el cronograma
 
 /* ---- Puente con Google Sheets -------------------------------------------
    Pega entre las comillas la URL del Apps Script que termina en /exec.
@@ -156,7 +156,7 @@ function nubeGuardar(){
     }
   }, 1000);
 }
-let puenteEnvio = null, puenteUltimo = 0;
+let puenteEnvio = null, puenteUltimo = 0, puenteFirma = null, puenteReloj = null;
 
 function nombreHoja(mid){
   const p = mid.split("-");
@@ -168,8 +168,14 @@ async function puenteLeer(forzado){
   if(!forzado && Date.now() - puenteUltimo < 25000) return;   // acaba de escribir: no se pisa
   if(puenteEnvio) return;                                      // hay un envío en cola
   try{
+    if(!forzado){                       // consulta liviana: solo pregunta si algo cambió
+      const rf = await fetch(PUENTE + "?modo=firma&t=" + Date.now());
+      const jf = await rf.json();
+      if(jf && jf.ok && puenteFirma && jf.firma === puenteFirma) return;
+    }
     const r = await fetch(PUENTE + "?t=" + Date.now());
     const j = await r.json();
+    if(j && j.firma) puenteFirma = j.firma;
     if(!j || !j.ok || !j.datos) return;
     let cambios = 0;
     Object.keys(j.datos.meses || {}).forEach(nombre => {
@@ -190,7 +196,11 @@ async function puenteLeer(forzado){
         });
       });
     });
-    if(cambios){ guardarLocal(); pintarTodo(); avisar("Tablero sincronizado con la hoja de cálculo.", true); }
+    if(cambios){
+      guardarLocal();
+      pintarTodo();
+      avisar(cambios === 1 ? "Un cambio nuevo del grupo." : cambios + " cambios nuevos del grupo.", true);
+    }
   }catch(e){
     avisar("No se pudo leer la hoja de cálculo. Revisa la conexión o el enlace del puente.");
   }
@@ -365,16 +375,21 @@ const SEED_APR = [
   {id:"ap9", orden:9, nombre:"Sergio Perdomo"}
 ];
 const SEED_SEP = {
-  ap1:{ev:[3,3,2,2], f:["","","26 de septiembre, 12:00 p. m.","27 de septiembre, 12:00 p. m."]},
+  ap1:{ev:[3,3,3,3], f:["","","",""]},
   ap2:{ev:[3,3,3,3], f:["","","",""]},
   ap3:{ev:[3,3,3,3], f:["","","",""]},
-  ap4:{ev:[3,3,3,3], f:["","","26 de septiembre, 12:00 p. m.",""]},
-  ap5:{ev:[3,3,3,2], f:["","","26 de septiembre, 12:00 p. m.","27 de septiembre, 12:00 p. m."]},
+  ap4:{ev:[0,0,0,0], f:["","","",""]},
+  ap5:{ev:[3,3,3,3], f:["","","",""]},
   ap6:{ev:[3,3,3,3], f:["","","",""]},
-  ap7:{ev:[3,3,3,3], f:["","","","27 de septiembre, 12:00 p. m."]},
-  ap8:{ev:[3,3,4,2], f:["","","26 de septiembre, 12:00 p. m.","27 de septiembre, 12:00 p. m."],
+  ap7:{ev:[3,3,3,3], f:["","","",""]},
+  ap8:{ev:[4,3,4,3], f:["","","",""],
        nota:"No responde a los llamados por correo ni por WhatsApp, individual o grupal."},
-  ap9:{ev:[3,3,2,2], f:["","","26 de septiembre, 12:00 p. m.","27 de septiembre, 12:00 p. m."]}
+  ap9:{ev:[3,3,3,1], f:["","","","Debe volver a entregar esta en D"]}
+};
+const SEED_OCT = {
+  ap1:{ev:[4,0,0,0]}, ap2:{ev:[3,0,0,0]}, ap3:{ev:[3,0,0,0]},
+  ap4:{ev:[0,0,0,0]}, ap5:{ev:[4,0,0,0]}, ap6:{ev:[3,0,0,0]},
+  ap7:{ev:[3,0,0,0]}, ap8:{ev:[3,0,0,0]}, ap9:{ev:[2,0,0,0]}
 };
 const SEED_SEM = [
   {mes:"2026-08", orden:1, etiqueta:"Semana 1", rango:"24 al 28 de agosto", lider:"ap6"}
@@ -1652,18 +1667,22 @@ function modoLocal(){
   const alDia = g && g.cronograma === CRONOGRAMA_V && Array.isArray(g.meses) && g.meses.length;
   meses = alDia ? g.meses : SEED_MESES.slice();
   aprendices = SEED_APR.slice();
-  registros = (g && Array.isArray(g.registros)) ? g.registros : SEED_APR.map(a => ({
-    id: "2026-09__" + a.id, mes:"2026-09", ap:a.id, orden:a.orden,
-    nota: SEED_SEP[a.id].nota || "",
-    evidencias: SEED_SEP[a.id].ev.map((e,i) => ({estado:e, compromiso:SEED_SEP[a.id].f[i]}))
-  }));
+  registros = (g && Array.isArray(g.registros)) ? g.registros
+    : SEED_APR.map(a => ({
+        id: "2026-09__" + a.id, mes: "2026-09", ap: a.id, orden: a.orden,
+        nota: SEED_SEP[a.id].nota || "",
+        evidencias: SEED_SEP[a.id].ev.map((e,i) => ({estado:e, compromiso:SEED_SEP[a.id].f[i]}))
+      })).concat(SEED_APR.map(a => ({
+        id: "2026-10__" + a.id, mes: "2026-10", ap: a.id, orden: a.orden, nota: "",
+        evidencias: SEED_OCT[a.id].ev.map(e => ({estado:e, compromiso:""}))
+      })));
   semanas = (g && Array.isArray(g.semanas)) ? g.semanas
     : SEED_SEM.map(s => Object.assign({id: s.mes + "__s" + s.orden}, s));
   mesActivo = mesActivo || mesDeHoy();
   pintarTodo();
   puenteLeer(true);
   nubeLeer();
-  if(PUENTE) setInterval(puenteLeer, 120000);   // revisa la hoja cada dos minutos
+  if(PUENTE) arrancarReloj();
   if(NUBE) setInterval(nubeLeer, 60000);        // revisa la nube cada minuto
 }
 
@@ -1682,7 +1701,7 @@ function suscribir(store){
   sub("semanas", d => { semanas = d; });
 }
 
-const VERSION = "2.7 · 8 de octubre de 2026";
+const VERSION = "3.0 · 8 de octubre de 2026";
 try{
   const temaGuardado = localStorage.getItem("phantom-tema");
   if(temaGuardado) document.documentElement.setAttribute("data-tema", temaGuardado);
@@ -1694,6 +1713,16 @@ try{
 const elVer = document.getElementById("version");
 const elAnio = document.getElementById("anio");
 if(elAnio) elAnio.textContent = new Date().getFullYear();
+
+function arrancarReloj(){
+  clearInterval(puenteReloj);
+  puenteReloj = setInterval(() => { if(!document.hidden) puenteLeer(); }, 45000);
+}
+
+// al volver a la pestaña o a la ventana, se revisa de inmediato
+document.addEventListener("visibilitychange", () => { if(!document.hidden) puenteLeer(); });
+window.addEventListener("focus", () => puenteLeer());
+window.addEventListener("online", () => puenteLeer(true));
 
 function marcarModo(compartido){
   if(elVer) elVer.textContent = "Versión " + VERSION + " · " +
