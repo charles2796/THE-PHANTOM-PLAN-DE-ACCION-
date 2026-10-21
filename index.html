@@ -2,21 +2,14 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#0d0d0d">
-<meta name="description" content="Seguimiento de las evidencias del grupo The Phantom Frame Studios, Tecnólogo en Animación Digital: fases, meses, estado de entrega por aprendiz, plazos y turno de liderazgo.">
-<meta name="author" content="Jhann Charles Corredor Jaimes">
-<meta property="og:title" content="Tablero de evidencias · The Phantom Frame Studios">
-<meta property="og:description" content="Cronograma por fases y meses, estado de entrega por aprendiz y turno de liderazgo.">
-<meta property="og:type" content="website">
-<meta property="og:image" content="logo.png">
+<meta name="color-scheme" content="light">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Tablero de evidencias · The Phantom Frame Studios</title>
 <link rel="icon" href="logo.png">
 <link rel="apple-touch-icon" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,600;0,700;0,800;1,400&family=Plus+Jakarta+Sans:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -70,6 +63,7 @@
   <button type="button" id="btn-pdf" class="herr">Imprimir o PDF</button>
   <button type="button" id="btn-wa" class="herr">Mensaje para el grupo</button>
   <button type="button" id="btn-tema" class="herr" aria-pressed="false">Modo oscuro</button>
+  <a class="herr" href="https://docs.google.com/spreadsheets/d/1D5LXlUyQsRZR3R079EtaUNdvaKQ7tIio9TpGUUI8BYU/edit?usp=sharing" target="_blank" rel="noopener">Abrir la hoja de seguimiento</a>
 </div>
 <div class="legend" id="legend"></div>
 <div class="aviso" id="aviso" hidden></div>
@@ -87,7 +81,9 @@
 
 <footer>
   <p>El tablero se guarda solo. Si dos personas marcan la misma casilla, queda la última marca.</p>
-  <p><a href="https://docs.google.com/spreadsheets/d/1D5LXlUyQsRZR3R079EtaUNdvaKQ7tIio9TpGUUI8BYU/edit?usp=sharing">Abrir la hoja de seguimiento</a></p>
+  <p class="acciones-pie">
+    <a class="btn-hoja" href="https://docs.google.com/spreadsheets/d/1D5LXlUyQsRZR3R079EtaUNdvaKQ7tIio9TpGUUI8BYU/edit?usp=sharing" target="_blank" rel="noopener">Abrir la hoja de seguimiento</a>
+  </p>
   <p class="version" id="version"></p>
   <p class="copy">© <span id="anio"></span> Diseñado y desarrollado por
     <a href="https://www.linkedin.com/in/charles-co27/" target="_blank" rel="noopener">Jhann Charles Corredor Jaimes</a>.
@@ -113,7 +109,7 @@
 const EST = ["Sin novedad","En desarrollo","Se entrega","Calificada","No entregado","Entregado tarde"];
 const LLAVE = "phantom-evidencias-v3";
 const LLAVE_QUIEN = "phantom-quien";
-const CRONOGRAMA_V = 5;   // sube este número cada vez que cambie el cronograma
+const CRONOGRAMA_V = 6;   // sube este número cada vez que cambie el cronograma
 
 /* ---- Puente con Google Sheets -------------------------------------------
    Pega entre las comillas la URL del Apps Script que termina en /exec.
@@ -387,8 +383,8 @@ const SEED_SEP = {
   ap9:{ev:[3,3,3,1], f:["","","","Debe volver a entregar esta en D"]}
 };
 const SEED_OCT = {
-  ap1:{ev:[4,0,0,0]}, ap2:{ev:[3,0,0,0]}, ap3:{ev:[3,0,0,0]},
-  ap4:{ev:[0,0,0,0]}, ap5:{ev:[4,0,0,0]}, ap6:{ev:[3,0,0,0]},
+  ap1:{ev:[4,0,0,0]}, ap2:{ev:[3,3,1,0]}, ap3:{ev:[3,2,3,0]},
+  ap4:{ev:[0,0,0,0]}, ap5:{ev:[2,0,0,0]}, ap6:{ev:[3,2,0,0]},
   ap7:{ev:[3,0,0,0]}, ap8:{ev:[3,0,0,0]}, ap9:{ev:[2,0,0,0]}
 };
 const SEED_SEM = [
@@ -993,12 +989,12 @@ function pintarTurno(){
 }
 
 const COLOR_LIDER = {
-  ap6:{f:"#1c2340", s:"#dfe1e9"},
-  ap9:{f:"#c25939", s:"#f6ded5"},
-  ap5:{f:"#3d5c4a", s:"#dde7e0"},
-  ap3:{f:"#8a5a06", s:"#f6e3c2"},
-  ap1:{f:"#3b4054", s:"#e3e4e9"},
-  ap7:{f:"#0d0d0d", s:"#e2e2e2"}
+  ap6:{f:"#15325c", s:"#e3ebf6"},
+  ap9:{f:"#1f4e8c", s:"#e7eefa"},
+  ap5:{f:"#3c77c4", s:"#eaf2fc"},
+  ap3:{f:"#8a6a00", s:"#fbf2d4"},
+  ap1:{f:"#c9a227", s:"#fdf6dd"},
+  ap7:{f:"#f5c518", s:"#fff6d6"}
 };
 const DIAS_ES = ["lun","mar","mié","jue","vie","sáb","dom"];
 
@@ -1010,18 +1006,19 @@ function pintarLideres(){
   const ultimo = new Date(p[0], p[1], 0);
   const hoy = new Date(); hoy.setHours(0,0,0,0);
 
-  let h = '<h2>Líderes por semana</h2><p class="cuenta">Cada semana toma el color de quien lidera. Los días hábiles van de lunes a viernes.</p>';
+  let h = '<h2>Líderes por semana</h2><p class="cuenta">Los días hábiles van de lunes a viernes. La semana en curso se marca en azul.</p>';
   h += '<div class="cal"><div class="cal-cab">' + DIAS_ES.map(d => '<span>' + d + '</span>').join("") + '</div>';
 
   let cursor = lunesDe(primero);
-  const usados = [];
   while(cursor <= ultimo){
     const lunes = new Date(cursor);
     const g = guardadaEn(lunes);
     const lider = (g && g.lider) ? g.lider : turnoDe(lunes);
     const col = COLOR_LIDER[lider] || {f:"var(--ink-2)", s:"var(--bg)"};
-    if(usados.indexOf(lider) === -1) usados.push(lider);
-    h += '<div class="cal-sem" style="--lf:' + col.f + ';--ls:' + col.s + '">';
+    const finSem = new Date(lunes.getFullYear(), lunes.getMonth(), lunes.getDate()+6);
+    const enCurso = hoy >= lunes && hoy <= finSem;
+    h += '<div class="cal-sem' + (enCurso ? ' en-curso' : '') +
+         '" style="--lf:' + col.f + ';--ls:' + col.s + '">';
     for(let i = 0; i < 7; i++){
       const d = new Date(lunes); d.setDate(d.getDate() + i);
       const fuera = d.getMonth() !== primero.getMonth();
@@ -1031,17 +1028,11 @@ function pintarLideres(){
         (esHoy ? ' hoy' : '') + '">' + d.getDate() + '</span>';
     }
     h += '<span class="cal-lider">' + esc(nombreLider(lider)) +
-      (hoy >= lunes && hoy <= new Date(lunes.getFullYear(), lunes.getMonth(), lunes.getDate()+6)
-        ? '<b class="ahora">esta semana</b>' : '') + '</span></div>';
+      (enCurso ? '<b class="ahora">esta semana</b>' : '') + '</span></div>';
     cursor.setDate(cursor.getDate() + 7);
   }
   h += '</div>';
 
-  h += '<div class="cal-leyenda">' + ROTACION.map(id =>
-    '<span class="cal-chip' + (usados.indexOf(id) === -1 ? ' off' : '') +
-    '" style="--lf:' + (COLOR_LIDER[id] ? COLOR_LIDER[id].f : "var(--ink-2)") + ';--ls:' +
-    (COLOR_LIDER[id] ? COLOR_LIDER[id].s : "var(--bg)") + '"><i></i>' +
-    esc(nombreLider(id)) + '</span>').join("") + '</div>';
   caja.innerHTML = h;
 }
 
@@ -1701,7 +1692,7 @@ function suscribir(store){
   sub("semanas", d => { semanas = d; });
 }
 
-const VERSION = "3.0 · 8 de octubre de 2026";
+const VERSION = "4.2 · 21 de octubre de 2026";
 try{
   const temaGuardado = localStorage.getItem("phantom-tema");
   if(temaGuardado) document.documentElement.setAttribute("data-tema", temaGuardado);
